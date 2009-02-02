@@ -1,0 +1,13 @@
++ import time, threading
++ def fromMainThread():
++     return "called from main thread"
+0 
++ def fromOtherThread():
++     return "called from other thread"
+0 
++ def neverCalled():
+-     return "no one calls me"
+0 
++ threading.Thread(target=fromOtherThread).start()
++ fromMainThread()
++ time.sleep(1)

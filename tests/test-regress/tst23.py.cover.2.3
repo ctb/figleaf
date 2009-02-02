@@ -1,0 +1,14 @@
+0 # A comment.
++ class theClass:
+0     ''' the docstring.
+0         Don't be fooled.
+0     '''
++     def __init__(self):
+0         ''' Another docstring. '''
++         self.a = 1
+0 
++     def foo(self):
++         return self.a
+0 
++ x = theClass().foo()
++ assert x == 1

@@ -1,0 +1,6 @@
+\.pyc
+build
+dist
+figleaf.egg-info
+.*~
+test-regress/support_tst8.py.cover

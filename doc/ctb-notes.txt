@@ -1,0 +1,17 @@
+% darcs tag --checkpoint -m release-0.6.1
+ -- tag release-0.6.1, and allow for --partial get.
+
+% darcs dist -d twill-0.6.1
+
+where to change version number:
+
+   setup.py, version & download URL;
+   figleaf/__init__.py
+   doc/index.txt, version, download URL, and date;
+
+for release:
+
+    * tag;
+    * generate .tar.gz
+    * update pypi (setup.py register);
+    * announce on clp, tip

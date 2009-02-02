@@ -1,0 +1,138 @@
+2008-11-16  Titus Brown  <t@iorich.caltech.edu>
+
+	* Applied Mark Seaborn's fix for leading whitespace.
+
+2008-07-20  Titus Brown  <t@iorich.caltech.edu>
+
+	* Added & refactored Ondrej Certik's patch fixing 'get_lines' to
+	  use the 'dis' module.
+
+2008-03-22  Titus Brown  <t@iorich.caltech.edu>
+
+	* Fixed 'excl' behavior for library modules imported in certain
+	  ways.  Now exclusions *should* be abspath based.
+
+2008-01-10  Titus Brown  <t@iorich.caltech.edu>
+	
+	* RELEASE 0.6.1
+
+2008-01-01  Titus Brown  <t@iorich.caltech.edu>
+
+	* Fixed 2.3, 2.4 behavior: test suite now passes for 2.3, 2.4, 2.5.
+
+2007-12-29  Titus Brown  <t@iorich.caltech.edu>
+
+	* Added tests for figleaf2html options.
+
+	* Fixed default values for files_list (drcygnus).
+
+	* Fixed some tests (executables), removed some unnecessary imports.
+
+2007-12-23  Titus Brown  <t@iorich.caltech.edu>
+
+	* Added '-f' option to figleaf2html support an explicit list of files
+	  (Andrew Dalke)
+
+2007-12-19  Titus Brown  <t@iorich.caltech.edu>
+
+	* Added a reload for figleaf.internals; how to deal with this??
+
+	* Added a test for a weird situation where a comment on the last
+	  line would cause problems; fixed up get_lines a bit.  Thanks
+	  to Andrew Dalke for pointing out this problem!
+
+	* Eliminated doctest examples from consideration.
+
+2007-12-16  Titus Brown  <t@iorich.caltech.edu>
+
+	* Fixed args options problem; cleaned up log message leftover;
+	  fixed weird import error on sets
+
+	* Added in tests for basic argument handling.
+
+	* Fixed zero args error message in figleaf/__init__:__main__.
+
+	* Fixed section coverage as well as test_section.py.
+
+	* Finished DOS EOL test, removed silly error-hiding issue.
+
+	* Refactored more annotation stuff, moving common functionality
+	  into annotate.py and renaming htmlizer and coverizer to
+	  annotate_html and annotate_cover.
+
+	* Refactored htmlizer significantly, fixing a bug or two and
+	  speeding it up dramatically.
+
+2007-10-31  Titus Brown  <t@iorich.caltech.edu>
+
+	* Separated out data handling from code tracer into
+          internals.CoverageData.  sections stuff still not working.
+
+2007-10-30  Titus Brown  <t@iorich.caltech.edu>
+
+	* Moved figleaf_sections plugin from pinocchio over to figleaf.
+
+	* Added some simple tests of the path include_only code.
+
+2007-10-28  Titus Brown  <t@iorich.caltech.edu>
+
+	* Fixed some leakiness issues with figleaf._t.
+
+	* Added some simple tests of the path exclusion code.
+
+	* Fixed some path import issues that had the wrong figleaf being
+	  imported on occasion.
+
+	* Created tests/test-bin-progs/.
+
+	* Moved tests/source into tests/test-regress, pushed fixtures
+	  into same dir.
+
+	* Added more robust options/configuration for figleaf-annotate,
+	  including support for a .rc file.
+
+	* Added beginning of figleaf-annotate functionality.
+
+2007-10-27  Titus Brown  <t@iorich.caltech.edu>
+
+	* Swizzled exclude_path stuff around a bit; added include_only_path.
+
+	* Fixed tst8/tst9 interaction issue.
+
+	* Removed 'tests/' from installed packages.
+
+	* Removed unnecessary/unused setuptools stuff.
+
+	* 'boringfile' set to include dist, build, figleaf.egg-info.
+
+	* Made regression tests version specific.
+
+	* Changed figleaf sections pickle file to '.figleaf_sections'.
+
+	* Moved stuff into 'internals/'.
+
+	* Bumped version to 0.6.1.
+
+2007-02-18  Titus Brown  <t@localhost.localdomain>
+
+	* detabbed htmlizer.py
+
+	* annotate_sections now defaults to '.figleaf' for coverage.
+
+	* Added dump_pickled_coverage and load_pickled_coverage functions.
+
+2007-02-17  Titus Brown  <t@localhost.localdomain>
+
+	* Added tests/test-section.py, too.
+
+	* Bumped version to 0.6
+
+	* Added script 'annotate-sections'.
+
+	* Added section coverage stuff.
+
+	* Added regression tests.
+
+2006-11-29  Titus Brown  <t@localhost.localdomain>
+
+	* Applied Iain Lowe's patches.

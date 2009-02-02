@@ -1,0 +1,46 @@
+ANNOUNCING figleaf v0.6.1.
+
+figleaf is a code coverage package for Python.  It supports simple
+and configurable recording of code coverage, as well as more complex
+'section'-based recording.  It's designed for programmers who want
+to integrate code coverage with their tests across a large code base
+in a dynamic way.
+
+This is the second package release of figleaf.
+
+Note that figleaf *requires* setuptools to be installed, although it
+should be usable without it.
+
+You can install figleaf with easy_install, or download this release at
+
+    http://darcs.idyll.org/~t/projects/figleaf-0.6.1.tar.gz
+
+Documentation is included in the .tar.gz, and you can read the latest
+docs online at
+
+     http://darcs.idyll.org/~t/projects/figleaf/doc/
+
+figleaf is available under the MIT license.  It is Copyright (C) 2006,
+2007, 2008 C. Titus Brown.
+
+I would especially like to thank Andrew Dalke for his contributions to this
+release.
+
+--titus
+
+---
+
+Important changes:
+
+ - introduced moderately thorough unit & functional testing so that I
+   don't release another crappy version.
+
+ - added regression tests.
+
+ - updated to work mostly properly with Python 2.3, 2.4, and 2.5.
+
+ - added a 'annotate all of these files, and no other' option to figleaf2html.
+
+ - fixed a variety of small-to-medium bugs and annoyances.
+
+ - figleaf_sections plugin for nose moved into this package from pinocchio.

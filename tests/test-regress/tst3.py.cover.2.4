@@ -1,0 +1,21 @@
++ class meta(type):
++     def __init__(cls, cls_name, cls_bases, cls_dict):
++         print 'hello, world'
+0 
++ class tst:
++     __metaclass__ = meta
+0 
++     def hi(self):
+0         """
+0         this is a docstring
+0         """
++         print 'hello, world 2'
+0 
++ tst().hi()
+0 
++ print \
+0       "hello, world" \
+0       "how do you do?"
+0 
++ "asdf" + \
+0        str(5)

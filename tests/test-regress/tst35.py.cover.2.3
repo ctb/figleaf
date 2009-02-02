@@ -1,0 +1,13 @@
++ def foo(
++     a = (lambda x: x*2)(10),
+0     b = (
++         lambda x:
+0             x+1
+0         )(1)
+0     ):
+0     ''' docstring
+0     '''
++     return a+b
+0 
++ x = foo()
++ assert x == 22

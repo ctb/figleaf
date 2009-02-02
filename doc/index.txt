@@ -1,0 +1,148 @@
+========================================
+figleaf -- Python code coverage analysis
+========================================
+:Author: `C. Titus Brown`
+:Contact: titus@idyll.org
+
+figleaf is a Python code coverage analysis tool, built somewhat on the
+model of Ned Batchelder's fantastic coverage_ module.  The goals of
+figleaf are to be a minimal replacement of 'coverage.py' that supports
+more configurable coverage gathering and reporting.
+
+The main differences are:
+
+ * figleaf labels lines as "interesting", i.e. capable of being
+   executed, if and only if Python will report their execution.
+   By contrast, 'coverage.py' reports on surrounding lines as well.
+
+   Note that this means your "lines of code" count may be much lower
+   with figleaf than with coverage.py...
+
+ * figleaf separates the reporting and the recording code completely;
+   in particular, no path munging or anything else is done on the
+   results of the trace function.  This means that files may -- or may
+   not -- be easier to find in figleaf; more is left up to your code,
+   basically.
+
+   This does make it a bit easier (IMO) to generate reports in other
+   formats, combine reports, etc.  (This was the factor that motivated
+   me to write figleaf.)  See especially the 'figleaf-to-html' code,
+   below.
+
+ * figleaf does not record coverage of code in the Python standard
+   library unless you explicitly request it to do so.  This can result
+   in a significant speedup -- up to 50% -- over 'coverage.py'.
+
+You should use coverage if you're primarily looking at code coverage
+of unit tests; figleaf is probably more useful for situations where
+you are recording code coverage in multiple execution runs and/or want
+to tweak the reporting output.
+
+Installing figleaf
+==================
+
+Run:
+
+     easy_install http://darcs.idyll.org/~t/projects/figleaf-latest.tar.gz
+
+Using figleaf from the command line
+===================================
+
+To run a command-line Python program with code coverage analysis, execute: ::
+
+   figleaf <program> <options to program>
+
+You can run the program from 'bin/figleaf' in the development directory,
+i.e. without installing it, if you wish.
+
+Using figleaf from within Python code
+=====================================
+
+Briefly, at the top of the first module to be imported, place: ::
+
+   import figleaf
+   figleaf.start()
+
+At the place where your program exits, place: ::
+
+   figleaf.stop()
+   figleaf.write_coverage('.figleaf')
+
+(You may want to put this in a 'finally:' clause.)
+
+Retrieving results from a running Python program
+------------------------------------------------
+
+The figleaf module was written to provide coverage for Web code; this
+occasionally presents a problem, because ideally you'd like to be able
+to retrieve the coverage results without exiting the Web server.
+Luckily the figleaf format is entire portable; just do ::
+
+   coverage = figleaf.get_info()
+   s = cPickle.dumps(coverage)
+
+and export 's' as a Web download.
+
+Coverage reports
+================
+
+The included program ``figleaf-to-html`` annotates Python files in
+HTML format; e.g. ::
+
+   figleaf2html -d ~/public_html/figleaf-output/ .figleaf
+
+will produce a report on all of the files referenced in ``.figleaf``,
+a coverage output database.  The default output directory name is
+'html', and the default coverage file is '.figleaf', so ::
+
+   figleaf2html
+
+is equivalent to
+
+   figleaf2html -d html .figleaf
+
+The ``-f FILENAME`` or ``--files-list FILENAME`` option will limit
+coverage reporting to the source files listed in the file FILENAME: ::
+
+   figleaf2html -f interesting-files.txt
+
+This is useful when there are files that may never be imported; if
+they are specified in ``interesting-files.txt`` then they will be
+reported with 0% coverage.
+
+The ``-q`` option changes the logging mode to print warnings only, and
+the ``-D`` option changes the logging mode to print all messages.
+
+Sections
+========
+
+@CTB - to be written -
+
+sections file vs coverage file
+==============================
+
+@CTB - to be written -
+
+nose plugins
+============
+
+@CTB - to be written -
+
+Stumbling blocks and advanced issues
+====================================
+
+canonical vs reported paths; speed issues.
+
+Acknowledgements
+================
+
+Iain Lowe has contributed several patches that are in the main figleaf
+branch; you can see his own darcs repository at
+http://code.ilowe.net/figleaf.
+
+Pratik Mehta contributed a patch to filename munging that is much appreciated!
+
+Andrew Dalke debugged figleaf output and suggested a number of new
+features.
+
+.. _coverage: http://www.nedbatchelder.com/code/modules/coverage.html

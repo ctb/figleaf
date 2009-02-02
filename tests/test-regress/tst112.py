@@ -1,0 +1,5 @@
+def fn():
+    a = 1
+    return a
+x = fn()
+assert(x == 1)

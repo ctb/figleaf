@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>figleaf -- Python code coverage analysis</title>
+<meta name="author" content="C. Titus Brown" />
+<style type="text/css">
+
+/*
+:Author: David Goodger
+:Contact: goodger@users.sourceforge.net
+:Date: $Date: 2005-12-18 01:56:14 +0100 (Sun, 18 Dec 2005) $
+:Revision: $Revision: 4224 $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin-left: 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em ;
+  background-color: #eeeeee }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+tt.docutils {
+  background-color: #eeeeee }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="figleaf-python-code-coverage-analysis">
+<h1 class="title">figleaf -- Python code coverage analysis</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td><cite class="first last">C. Titus Brown</cite></td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td><a class="first last reference" href="mailto:titus&#64;idyll.org">titus&#64;idyll.org</a></td></tr>
+</tbody>
+</table>
+<p>figleaf is a Python code coverage analysis tool, built somewhat on the
+model of Ned Batchelder's fantastic <a class="reference" href="http://www.nedbatchelder.com/code/modules/coverage.html">coverage</a> module.  The goals of
+figleaf are to be a minimal replacement of 'coverage.py' that supports
+more configurable coverage gathering and reporting.</p>
+<p>The main differences are:</p>
+<blockquote>
+<ul>
+<li><p class="first">figleaf labels lines as &quot;interesting&quot;, i.e. capable of being
+executed, if and only if Python will report their execution.
+By contrast, 'coverage.py' reports on surrounding lines as well.</p>
+<p>Note that this means your &quot;lines of code&quot; count may be much lower
+with figleaf than with coverage.py...</p>
+</li>
+<li><p class="first">figleaf separates the reporting and the recording code completely;
+in particular, no path munging or anything else is done on the
+results of the trace function.  This means that files may -- or may
+not -- be easier to find in figleaf; more is left up to your code,
+basically.</p>
+<p>This does make it a bit easier (IMO) to generate reports in other
+formats, combine reports, etc.  (This was the factor that motivated
+me to write figleaf.)  See especially the 'figleaf-to-html' code,
+below.</p>
+</li>
+<li><p class="first">figleaf does not record coverage of code in the Python standard
+library unless you explicitly request it to do so.  This can result
+in a significant speedup -- up to 50% -- over 'coverage.py'.</p>
+</li>
+</ul>
+</blockquote>
+<p>You should use coverage if you're primarily looking at code coverage
+of unit tests; figleaf is probably more useful for situations where
+you are recording code coverage in multiple execution runs and/or want
+to tweak the reporting output.</p>
+<div class="section">
+<h1><a id="installing-figleaf" name="installing-figleaf">Installing figleaf</a></h1>
+<p>Run:</p>
+<blockquote>
+easy_install <a class="reference" href="http://darcs.idyll.org/~t/projects/figleaf-latest.tar.gz">http://darcs.idyll.org/~t/projects/figleaf-latest.tar.gz</a></blockquote>
+</div>
+<div class="section">
+<h1><a id="using-figleaf-from-the-command-line" name="using-figleaf-from-the-command-line">Using figleaf from the command line</a></h1>
+<p>To run a command-line Python program with code coverage analysis, execute:</p>
+<pre class="literal-block">
+figleaf &lt;program&gt; &lt;options to program&gt;
+</pre>
+<p>You can run the program from 'bin/figleaf' in the development directory,
+i.e. without installing it, if you wish.</p>
+</div>
+<div class="section">
+<h1><a id="using-figleaf-from-within-python-code" name="using-figleaf-from-within-python-code">Using figleaf from within Python code</a></h1>
+<p>Briefly, at the top of the first module to be imported, place:</p>
+<pre class="literal-block">
+import figleaf
+figleaf.start()
+</pre>
+<p>At the place where your program exits, place:</p>
+<pre class="literal-block">
+figleaf.stop()
+figleaf.write_coverage('.figleaf')
+</pre>
+<p>(You may want to put this in a 'finally:' clause.)</p>
+<div class="section">
+<h2><a id="retrieving-results-from-a-running-python-program" name="retrieving-results-from-a-running-python-program">Retrieving results from a running Python program</a></h2>
+<p>The figleaf module was written to provide coverage for Web code; this
+occasionally presents a problem, because ideally you'd like to be able
+to retrieve the coverage results without exiting the Web server.
+Luckily the figleaf format is entire portable; just do</p>
+<pre class="literal-block">
+coverage = figleaf.get_info()
+s = cPickle.dumps(coverage)
+</pre>
+<p>and export 's' as a Web download.</p>
+</div>
+</div>
+<div class="section">
+<h1><a id="coverage-reports" name="coverage-reports">Coverage reports</a></h1>
+<p>The included program <tt class="docutils literal"><span class="pre">figleaf-to-html</span></tt> annotates Python files in
+HTML format; e.g.</p>
+<pre class="literal-block">
+figleaf2html -d ~/public_html/figleaf-output/ .figleaf
+</pre>
+<p>will produce a report on all of the files referenced in <tt class="docutils literal"><span class="pre">.figleaf</span></tt>,
+a coverage output database.  The default output directory name is
+'html', and the default coverage file is '.figleaf', so</p>
+<pre class="literal-block">
+figleaf2html
+</pre>
+<p>is equivalent to</p>
+<blockquote>
+figleaf2html -d html .figleaf</blockquote>
+<p>The <tt class="docutils literal"><span class="pre">-f</span> <span class="pre">FILENAME</span></tt> or <tt class="docutils literal"><span class="pre">--files-list</span> <span class="pre">FILENAME</span></tt> option will limit
+coverage reporting to the source files listed in the file FILENAME:</p>
+<pre class="literal-block">
+figleaf2html -f interesting-files.txt
+</pre>
+<p>This is useful when there are files that may never be imported; if
+they are specified in <tt class="docutils literal"><span class="pre">interesting-files.txt</span></tt> then they will be
+reported with 0% coverage.</p>
+<p>The <tt class="docutils literal"><span class="pre">-q</span></tt> option changes the logging mode to print warnings only, and
+the <tt class="docutils literal"><span class="pre">-D</span></tt> option changes the logging mode to print all messages.</p>
+</div>
+<div class="section">
+<h1><a id="sections" name="sections">Sections</a></h1>
+<p>&#64;CTB - to be written -</p>
+</div>
+<div class="section">
+<h1><a id="sections-file-vs-coverage-file" name="sections-file-vs-coverage-file">sections file vs coverage file</a></h1>
+<p>&#64;CTB - to be written -</p>
+</div>
+<div class="section">
+<h1><a id="nose-plugins" name="nose-plugins">nose plugins</a></h1>
+<p>&#64;CTB - to be written -</p>
+</div>
+<div class="section">
+<h1><a id="stumbling-blocks-and-advanced-issues" name="stumbling-blocks-and-advanced-issues">Stumbling blocks and advanced issues</a></h1>
+<p>canonical vs reported paths; speed issues.</p>
+</div>
+<div class="section">
+<h1><a id="acknowledgements" name="acknowledgements">Acknowledgements</a></h1>
+<p>Iain Lowe has contributed several patches that are in the main figleaf
+branch; you can see his own darcs repository at
+<a class="reference" href="http://code.ilowe.net/figleaf">http://code.ilowe.net/figleaf</a>.</p>
+<p>Pratik Mehta contributed a patch to filename munging that is much appreciated!</p>
+<p>Andrew Dalke debugged figleaf output and suggested a number of new
+features.</p>
+</div>
+</div>
+</body>
+</html>

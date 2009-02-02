@@ -1,0 +1,28 @@
+ANNOUNCING figleaf v0.6.
+
+figleaf is a code coverage package for Python.  It supports simple
+and configurable recording of code coverage, as well as more complex
+'section'-based recording.  It's designed for programmers who want
+to integrate code coverage with their tests across a large code base.
+
+This is the first package release of figleaf.
+
+Note that figleaf *requires* setuptools to be installed, although it
+should be usable without it.
+
+You can install figleaf with easy_install, or download this release at
+
+    http://darcs.idyll.org/~t/projects/figleaf-0.6.tar.gz
+
+Documentation is included in the .tar.gz, and you can read the latest
+docs online at
+
+     http://darcs.idyll.org/~t/projects/figleaf/doc/
+
+figleaf is available under the MIT license.  It is Copyright (C) 2006,
+2007 C. Titus Brown.
+
+I would especially like to thank Iain Lowe for his contributions to this
+release.
+
+--titus

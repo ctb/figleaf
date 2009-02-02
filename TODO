@@ -1,0 +1,12 @@
+BUG: x = [ ... ] first line of multi-line list def isn't covered.
+
+---
+
+these modules are imported before coverage tracing starts.
+
+for k in 'types', 'symbol', 'sre_constants', 'keyword':
+    reload(sys.modules[k])
+
+---
+
+also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.
