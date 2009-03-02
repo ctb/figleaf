@@ -54,8 +54,16 @@ def test():
     union = set()
 
     expected = dict(a = set([17, 18, 11, 14]),
-                    b = set([22, 11, 21, 14]),
-                    c = set([25, 26, 11, 14]))
+                    b = set([11, 14, 21, 22]),
+                    c = set([11, 14, 25, 26]))
+    expected_in_common = [11, 14]
+    expected_union = [11, 14, 17, 18, 21, 22, 25, 26]
+    if figleaf.internals.PythonCollector is not  figleaf.internals.Collector:
+        expected['a'].update([40, 42, 43, 44, 45, 47])
+        expected['b'].update([40, 42, 45, 47, 48, 49])
+        expected['c'].update([40, 42, 45, 47, 50, 51])
+        expected_in_common += [40, 42, 45, 47]
+        expected_union += [40, 42, 43, 44, 45, 47, 48, 49, 50, 51]
     
     for i in ('a', 'b', 'c'):
         actual = figleaf.get_info(section_name=i).get(thisfile())
@@ -83,13 +91,13 @@ def test():
     in_common.sort()
     print 'common:', in_common
 
-    assert in_common == [11, 14]
+    assert in_common == expected_in_common
 
     union = list(union)
     union.sort()
     print 'union:', union
     
-    assert union == [11, 14, 17, 18, 21, 22, 25, 26]
+    assert union == expected_union
 
 def setup():
     pass
