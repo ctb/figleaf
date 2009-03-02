@@ -262,10 +262,6 @@ collector_getlines(CollectorObject *self, PyObject *args, PyObject *kw)
     Py_ssize_t pos = 0;
     int i;
     PyObject * results;
-    printf("Cache hit: %d/%d: %0.2f\n", cache_hit, total_lines, 
-            cache_hit / (total_lines * 1.0));
-    printf("Exclude hit: %d/%d: %0.2f\n", exclude_hit, total_exclude, 
-            exclude_hit / (total_exclude * 1.0));
 
     results = PyDict_New();
     FileCoverage * file_coverage;
