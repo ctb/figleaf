@@ -117,17 +117,17 @@ def write_html_summary(info_dict, directory):
     index_fp.close()
     
 
-def report_as_html(coverage, directory, exclude_patterns, files_list):
+def report_as_html(coverage, directory, exclude_patterns, files_list,
+                   extra_files=None):
     """
     Write an HTML report on all of the files, plus a summary.
     """
 
-    ### now, output.
+    ### assemble information.
 
     keys = coverage.keys()
-    info_dict = {}
+    line_info = {}
     for pyfile in filter_files(keys, exclude_patterns, files_list):
-
         try:
             fp = open(pyfile, 'rU')
             lines = figleaf.get_lines(fp)
@@ -140,28 +140,40 @@ def report_as_html(coverage, directory, exclude_patterns, files_list):
             logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
             continue
 
+        # initialize
+        covered = coverage.get(pyfile, set())
+
+        line_info[pyfile] = (lines, covered)
+
+    if extra_files:
+        for (otherfile, lines, covered) in extra_files:
+            line_info[otherfile] = (lines, covered)
+
+    ### now, output.
+    info_dict = {}
+
+    for filename, (lines, covered) in line_info.items():
+        fp = open(filename, 'rU')
+
         #
         # ok, we want to annotate this file.  now annotate file ==> html.
         #
 
-        # initialize
-        covered = coverage.get(pyfile, set())
-
-        # rewind
+        # rewind fp
         fp.seek(0)
 
         # annotate
         output, n_covered, n_lines, percent = annotate_file(fp, lines, covered)
 
         # summarize
-        info_dict[pyfile] = (n_lines, n_covered, percent)
+        info_dict[filename] = (n_lines, n_covered, percent)
 
         # write out the file
-        html_outfile = make_html_filename(pyfile)
+        html_outfile = make_html_filename(filename)
         html_outfile = os.path.join(directory, html_outfile)
         html_outfp = open(html_outfile, 'w')
         
-        html_outfp.write('source file: <b>%s</b><br>\n' % (pyfile,))
+        html_outfp.write('source file: <b>%s</b><br>\n' % (filename,))
         html_outfp.write('''
 
 file stats: <b>%d lines, %d executed: %.1f%% covered</b>
@@ -173,7 +185,7 @@ file stats: <b>%d lines, %d executed: %.1f%% covered</b>
             
         html_outfp.close()
 
-        logger.info('reported on %s' % (pyfile,))
+        logger.info('reported on %s' % (filename,))
 
     ### print a summary, too.
     write_html_summary(info_dict, directory)
