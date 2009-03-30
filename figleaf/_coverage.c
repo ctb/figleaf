@@ -225,10 +225,15 @@ int get_current_file(CollectorObject * co,
 
     filename = frame->f_code->co_filename;
     current_file = co->current_file;
-    if (current_file
-        && (current_file->filename == filename || \
-            !strcmp(PyString_AS_STRING(current_file->filename),
-                    PyString_AS_STRING(filename))))
+    if (co->latest_exclude == filename) {
+        total_exclude++;
+        exclude_hit++;
+        current_file = NULL;
+    }
+    else if (current_file
+             && (current_file->filename == filename || \
+             !strcmp(PyString_AS_STRING(current_file->filename),
+                     PyString_AS_STRING(filename))))
     {
         cache_hit++;
     }
@@ -236,12 +241,6 @@ int get_current_file(CollectorObject * co,
         /* Cache miss - we've switched files and need to perform
            the slow actions of checking to make sure we should
            record this file */
-        rc = should_exclude_file(co, frame);
-        if (co->latest_exclude == filename) {
-            total_exclude++;
-            exclude_hit++;
-            current_file = NULL;
-        }
         rc = should_exclude_file(co, frame);
         if(rc == -1){
             goto error;
@@ -319,8 +318,8 @@ int collector_trace_callback(PyObject *self, PyFrameObject *frame, int what,
 
 int collector_profile_callback(PyObject *self, PyFrameObject *frame, int what,
 		               PyObject *arg) {
-    /* Call to indicate that we were called w/ the SetProfile function.
-       Unfortunately there is no other way */
+    /* This function is called when setProfile is set (when we are excluding
+       the current function */
     return collector_callback(self, frame, what, arg, 0);
 }
 
