@@ -27,6 +27,7 @@ Collector.clear: removes all coverage data from this object.
 #include <unistd.h>
 #include <pythread.h>
 
+
 /*
 DEFAULT_FILE_SIZE: File size that most python files are smaller than
 (counting line numbers).  We assert that most python code occurs on line #s
@@ -43,45 +44,54 @@ static int DEFAULT_FILE_SIZE = 5000;
    can be updated atomically.  */
 
 int cache_hit = 0;
+int total_calls = 0;
 int total_lines = 0;
 int total_exclude = 0;
 int exclude_hit = 0;
-typedef struct {
+
+typedef struct
+{
     int * line_array;
     PyObject * filename;
 } FileCoverage;
 
 /* cleanup method for FileCoverage CObjects */
-void dealloc_file_coverage(void * f) {
+void dealloc_file_coverage(void * f)
+{
     FileCoverage * file_coverage;
     file_coverage = (FileCoverage *)f;
     free(file_coverage->line_array);
     free(file_coverage);
 }
 
-typedef struct {
+typedef struct
+{
     PyObject_HEAD
-    PyObject * files;           /* {file : FileCoverage() } dict 
-                                   for lines < DEFAULT_FILE_SIZE } */
-    FileCoverage * latest_file; /* pointer to name, lines for last-used file */
-    PyObject * latest_exclude;  /* pointer to last excluded file for 
+    PyObject * files;              /* {file : FileCoverage() } dict
+                                      for lines < DEFAULT_FILE_SIZE } */
+    PyObject * latest_exclude;  /* pointer to last excluded file for
                                    quick check */
-    PyObject * large_files;     /* {(file, lineno) : None} dict
-                                   for lines >= DEFAULT_FILE_SIZE */
+    PyObject * large_files;        /* {(file, lineno) : None} dict
+                                      for lines >= DEFAULT_FILE_SIZE */
     char * exclude_prefix;      /* ignore files starting with this prefix */
     char * include_prefix;      /* ignore files not starting with this prefix */
-    PyObject * lock;            /* Used to avoid threading 
-                                   contention when adding files */
+    PyObject * lock;               /* Used to avoid threading  */
+    FileCoverage * current_file;   /* pointer to name, lines for
+                                      last-used file */
 } CollectorObject;
 
 staticforward PyTypeObject PyCollector_Type;
+
+static void set_profiler(CollectorObject *co, FileCoverage* current_file,
+                         int tracing);
 
 /*
 slow_add_file:
 Standard way of adding file - add (filename, lineno) to python dict.
 This is slow but always works - used for lineno > DEFAULT_FILE_SIZE
 */
-int slow_add_file(CollectorObject * co, PyObject * filename, long lineno) {
+int slow_add_file(CollectorObject * co, PyObject * filename, long lineno)
+{
     PyObject * t = NULL;
     t = PyTuple_New(2);
     if(t == NULL)
@@ -101,10 +111,12 @@ error:
     return -1;
 }
 
-/* add_new_file: adds FileCoverage object for filename to collector dict
+/*
+   add_new_file: adds FileCoverage object for filename to collector dict
    in a (hopefully) thread-safe manner.
 */
-static FileCoverage * add_new_file(CollectorObject * co, PyObject * filename) {
+static FileCoverage * add_new_file(CollectorObject * co, PyObject * filename)
+{
     FileCoverage * file_coverage;
     PyObject * file_coverage_obj;
     PyThread_acquire_lock(co->lock, 1);
@@ -122,7 +134,7 @@ static FileCoverage * add_new_file(CollectorObject * co, PyObject * filename) {
        PyErr_SetFromErrno(PyExc_OSError);
        goto error;
     }
-    file_coverage_obj = PyCObject_FromVoidPtr((void *)file_coverage, 
+    file_coverage_obj = PyCObject_FromVoidPtr((void *)file_coverage,
                                               dealloc_file_coverage);
     if(file_coverage_obj == NULL) {
         goto error;
@@ -134,16 +146,18 @@ static FileCoverage * add_new_file(CollectorObject * co, PyObject * filename) {
     PyThread_release_lock(co->lock);
     return file_coverage;
 error:
-    if(file_coverage)
+    if(file_coverage) {
         free(file_coverage->line_array);
         free(file_coverage);
+    }
     PyThread_release_lock(co->lock);
     return NULL;
 }
 
 /* get_or_add_file: return file coverage object for filename, creating it
    if necessary */
-static FileCoverage * get_or_add_file(CollectorObject * co, PyObject * filename) {
+static FileCoverage * get_or_add_file(CollectorObject * co, PyObject * filename)
+{
     FileCoverage * file_coverage;
     PyObject * file_coverage_obj = NULL;
 
@@ -174,14 +188,14 @@ static void mark_line(CollectorObject * co, PyObject * filename, long lineno,
 static int should_exclude_file(CollectorObject * co, PyFrameObject * frame) {
     PyObject * filename;
     if (co->exclude_prefix) {
-        filename = PyDict_GetItemString(frame->f_globals, "__file__");
         /* NOTE - next section is mimicing some behavior
            in figleaf that I'm not sure I quite understand.
-           For the exclude prefix, we always translate 
-           the path to an absolute path, but for include 
+           For the exclude prefix, we always translate
+           the path to an absolute path, but for include
            prefix, we'll use the relative path that's kept
            in frame->f_lineno.
         */
+        filename = PyDict_GetItemString(frame->f_globals, "__file__");
         if (filename == NULL)
             filename = frame->f_code->co_filename;
         if (0 == strncmp(co->exclude_prefix, \
@@ -201,55 +215,131 @@ static int should_exclude_file(CollectorObject * co, PyFrameObject * frame) {
     return 0;
 }
 
+int get_current_file(CollectorObject * co,
+                     PyFrameObject *frame,
+                     FileCoverage ** return_file_coverage)
+{
+    PyObject * filename;
+    FileCoverage * current_file;
+    int rc;
+
+    filename = frame->f_code->co_filename;
+    current_file = co->current_file;
+    if (current_file
+        && (current_file->filename == filename || \
+            !strcmp(PyString_AS_STRING(current_file->filename),
+                    PyString_AS_STRING(filename))))
+    {
+        cache_hit++;
+    }
+    else {
+        /* Cache miss - we've switched files and need to perform
+           the slow actions of checking to make sure we should
+           record this file */
+        rc = should_exclude_file(co, frame);
+        if (co->latest_exclude == filename) {
+            total_exclude++;
+            exclude_hit++;
+            current_file = NULL;
+        }
+        rc = should_exclude_file(co, frame);
+        if(rc == -1){
+            goto error;
+        } else if (rc) {
+            total_exclude++;
+            Py_INCREF(filename);
+            Py_XDECREF(co->latest_exclude);
+            co->latest_exclude = filename;
+            current_file = NULL;
+        }
+        else {
+            current_file = get_or_add_file(co, filename);
+            if(current_file == NULL) {
+                goto error;
+            }
+        }
+    }
+    if(current_file != NULL) {
+        co->current_file = current_file;
+    }
+    *return_file_coverage = current_file;
+    return 0;
+error:
+    return 1;
+}
 
 /* collector_callback: CPython's callback interface for tracing.
    adds line coverage information.  */
 int collector_callback(PyObject *self, PyFrameObject *frame, int what,
-		   PyObject *arg) {
+		       PyObject *arg, int tracing)
+{
     CollectorObject *co = (CollectorObject *) self;
-    PyObject * filename;
+    FileCoverage * current_file;
+    int rc;
 
     switch (what) {
+    case PyTrace_CALL:
+        total_calls++;
+        rc = get_current_file(co, frame, &current_file);
+        if(rc != 0) {
+            goto error;
+        }
+        set_profiler(co, current_file, tracing);
+        break;
+    case PyTrace_RETURN:
+        rc = get_current_file(co, frame, &current_file);
+        if(rc != 0) {
+            goto error;
+        }
+        set_profiler(co, current_file, tracing);
+        break;
     case PyTrace_LINE:
-        filename = frame->f_code->co_filename;
-        if (!co->latest_file \
-            || (co->latest_file->filename != filename && \
-                strcmp(PyString_AS_STRING(co->latest_file->filename), 
-                      PyString_AS_STRING(filename)))) {
-            /* Cache miss - we've switched files and need to perform
-               the slow actions of checking to make sure we should
-               record this file */
-            if (co->latest_exclude == filename) {
-                total_exclude++;
-                exclude_hit++;
-                break;
-            }
-            else if(should_exclude_file(co, frame)) {
-                total_exclude++;
-                Py_INCREF(filename);
-                Py_XDECREF(co->latest_exclude);
-                co->latest_exclude = filename;
-                break;
-            }
-            co->latest_file = get_or_add_file(co, filename);
-            if(co->latest_file == NULL)
-                goto error;
-        }
-        else {
-            cache_hit++;
-        }
         total_lines++;
-        mark_line(co, filename, frame->f_lineno, 
-                  co->latest_file);
-	break;
-    default:
-        frame->f_trace = NULL;
+        /* Need to redetermine the current file even though
+           we set it at CALL in case we're threaded */
+        rc = get_current_file(co, frame, &current_file);
+        if(rc != 0) {
+            goto error;
+        } else if(current_file) {
+            mark_line(co, current_file->filename, frame->f_lineno,
+                      current_file);
+        }
 	break;
     }
     return 0;
 error:
     frame->f_trace = NULL;
     return 0;
+}
+
+int collector_trace_callback(PyObject *self, PyFrameObject *frame, int what,
+		             PyObject *arg) {
+    return collector_callback(self, frame, what, arg, 1);
+}
+
+int collector_profile_callback(PyObject *self, PyFrameObject *frame, int what,
+		               PyObject *arg) {
+    /* Call to indicate that we were called w/ the SetProfile function.
+       Unfortunately there is no other way */
+    return collector_callback(self, frame, what, arg, 0);
+}
+
+static void set_profiler(CollectorObject *co, FileCoverage * current_file,
+                         int tracing)
+{
+    if(current_file) {
+        if(!tracing) {
+            PyEval_SetProfile(NULL, NULL);
+            Py_INCREF((PyObject *)co);
+            PyEval_SetTrace(collector_trace_callback, (PyObject *)co);
+            co->current_file = current_file;
+        }
+    }
+    else if(tracing) {
+        PyEval_SetTrace(NULL, NULL);
+        Py_INCREF((PyObject *)co);
+        PyEval_SetProfile(collector_profile_callback, (PyObject *)co);
+    }
 }
 
 /* collector methods */
@@ -295,7 +385,8 @@ PyDoc_STRVAR(enable_doc, "enable() -> enable the coverage collector");
 static PyObject*
 collector_enable(CollectorObject *self, PyObject *args, PyObject *kw)
 {
-    PyEval_SetTrace(collector_callback, (PyObject*)self);
+    Py_INCREF((PyObject *)self);
+    PyEval_SetTrace(collector_trace_callback, (PyObject*)self);
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -306,7 +397,18 @@ collector_disable(CollectorObject *self, PyObject *args, PyObject *kw)
 {
     Py_INCREF(Py_None);
     PyEval_SetTrace(NULL, NULL);
+    PyEval_SetProfile(NULL, NULL);
     return Py_None;
+}
+
+static void print_stats()
+{
+    printf("Function calls: %d\n", total_calls);
+    printf("Cache hits (fn is in same file): %d\n", cache_hit);
+    printf("Percentage (fn is in same file): %0.2f\n", 
+           cache_hit/(total_calls*1.0));
+    printf("Total files excluded: %d\n", total_exclude);
+    printf("Total lines: %d\n", total_lines);
 }
 
 PyDoc_STRVAR(clear_doc, "clear() -> clear the coverage collector");
@@ -330,6 +432,7 @@ static PyMethodDef collector_methods[] = {
 static void
 collector_dealloc(CollectorObject *co)
 {
+    PyEval_SetTrace(NULL, NULL);
     Py_XDECREF(co->files);
     Py_XDECREF(co->latest_exclude);
     co->ob_type->tp_free(co);
@@ -339,8 +442,8 @@ collector_dealloc(CollectorObject *co)
     if (co->include_prefix != NULL) {
         free(co->include_prefix);
     }
-    co->latest_file = NULL;
-    PyThread_free_lock(co->lock);
+    co->current_file = NULL;
+    co->ob_type->tp_free(co);
 }
 
 static int
@@ -364,7 +467,7 @@ collector_init(CollectorObject *co, PyObject *args, PyObject *kw)
     else {
         co->include_prefix = NULL;
     }
-    co->latest_file = NULL;
+    co->current_file = NULL;
     co->latest_exclude = NULL;
     return 0;
 }
