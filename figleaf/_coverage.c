@@ -83,7 +83,7 @@ typedef struct
 staticforward PyTypeObject PyCollector_Type;
 
 static void set_profiler(CollectorObject *co, FileCoverage* current_file,
-                         int tracing);
+                         int tracing, int force_trace);
 
 /*
 slow_add_file:
@@ -283,16 +283,18 @@ int collector_callback(PyObject *self, PyFrameObject *frame, int what,
         if(rc != 0) {
             goto error;
         }
-        set_profiler(co, current_file, tracing);
+        set_profiler(co, current_file, tracing, 0);
         break;
     case PyTrace_RETURN:
+        total_calls++;
         rc = get_current_file(co, frame, &current_file);
         if(rc != 0) {
             goto error;
         }
-        set_profiler(co, current_file, tracing);
+        set_profiler(co, current_file, tracing, 1);
         break;
     case PyTrace_LINE:
+        total_calls++;
         total_lines++;
         /* Need to redetermine the current file even though
            we set it at CALL in case we're threaded */
@@ -302,6 +304,9 @@ int collector_callback(PyObject *self, PyFrameObject *frame, int what,
         } else if(current_file) {
             mark_line(co, current_file->filename, frame->f_lineno,
                       current_file);
+        }
+        else {
+            set_profiler(co, current_file, tracing, 0);
         }
 	break;
     }
@@ -324,9 +329,9 @@ int collector_profile_callback(PyObject *self, PyFrameObject *frame, int what,
 }
 
 static void set_profiler(CollectorObject *co, FileCoverage * current_file,
-                         int tracing)
+                         int tracing, int force_trace)
 {
-    if(current_file) {
+    if(current_file || force_trace) {
         if(!tracing) {
             PyEval_SetProfile(NULL, NULL);
             Py_INCREF((PyObject *)co);
@@ -385,6 +390,7 @@ static PyObject*
 collector_enable(CollectorObject *self, PyObject *args, PyObject *kw)
 {
     Py_INCREF((PyObject *)self);
+    PyEval_SetProfile(NULL, NULL);
     PyEval_SetTrace(collector_trace_callback, (PyObject*)self);
     Py_INCREF(Py_None);
     return Py_None;

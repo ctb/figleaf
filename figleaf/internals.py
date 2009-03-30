@@ -110,6 +110,7 @@ class CodeTracer:
     def _disable(self):
         self.started = False
         sys.settrace(None)
+        sys.setprofile(None)
         threading.settrace(None)
         self.stop_section()
 
