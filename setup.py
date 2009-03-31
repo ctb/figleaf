@@ -16,8 +16,9 @@ setup(name = 'figleaf',
       author_email = 'titus@caltech.edu',
       license='BSD',
       packages=['figleaf'],
-      
-      ext_modules=[Extension('figleaf._coverage', ['figleaf/_coverage.c']),],
+
+# disabled for py3k      
+#      ext_modules=[Extension('figleaf._coverage', ['figleaf/_coverage.c']),],
       
       entry_points = {
          'console_scripts': [
