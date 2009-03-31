@@ -27,6 +27,12 @@ Collector.clear: removes all coverage data from this object.
 #include <unistd.h>
 #include <pythread.h>
 
+#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION == 4
+
+typedef ssize_t         Py_ssize_t;
+
+#endif
+
 
 /*
 DEFAULT_FILE_SIZE: File size that most python files are smaller than
