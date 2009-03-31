@@ -28,6 +28,7 @@ setup(name = 'figleaf',
             'annotate-sections = figleaf.annotate_sections:main',
         ],
         'nose.plugins.0.10': [
+            'figleaf = figleaf.nose_plugin:Figleaf',
             'figleaf-sections = figleaf.nose_sections:FigleafSections',
             ],
          },
