@@ -184,6 +184,7 @@ class CoverageData:
         else:
             coverage_dict = self.sections.get(name, {})
             self.update_coverage(cov, coverage_dict)
+
         return cov
 
     def gather_sections(self, file):
@@ -193,12 +194,13 @@ class CoverageData:
         sets containing (integer) line numbers.
         """
         sections = {}
-        for k, c in self.sections.items():
+        for section_name, c in self.sections.items():
             s = set()
-            for (filename, line) in c.keys():
+            for filename in c.keys():
                 if filename == file:
-                    s.add(line)
-            sections[k] = s
+                    lines = c[filename]
+                    s.update(lines)
+            sections[section_name] = s
         return sections
 
 class PythonCollector(object):

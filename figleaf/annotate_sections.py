@@ -34,9 +34,9 @@ def annotate_file_with_sections(short, data, full_cov):
 
     tags = {}
     sections = data.gather_sections(full)
-    sections.update(data.gather_sections(short))
-
-    print data.sections
+    short_sections = data.gather_sections(short)
+    for k, v in sections.items():
+        v.update(short_sections.get(k, set()))
 
     print '*** PROCESSING:', short, '\n\t==>', short + '.sections'
     for tag, cov in sections.items():
