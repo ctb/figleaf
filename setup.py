@@ -4,6 +4,7 @@ except ImportError:
     raise Exception("you must have ez_setup/setuptools installed in order to use figleaf, sorry...")
 
 from setuptools import setup, find_packages
+from distutils.core import Extension
 
 setup(name = 'figleaf',
       version="0.6.1",
@@ -15,6 +16,9 @@ setup(name = 'figleaf',
       author_email = 'titus@caltech.edu',
       license='BSD',
       packages=['figleaf'],
+      
+      ext_modules=[Extension('figleaf._coverage', ['figleaf/_coverage.c']),],
+      
       entry_points = {
          'console_scripts': [
             'figleaf = figleaf:main',
