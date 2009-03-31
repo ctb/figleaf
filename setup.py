@@ -30,6 +30,8 @@ setup(name = 'figleaf',
         'nose.plugins.0.10': [
             'figleaf-sections = figleaf.nose_sections:FigleafSections',
             ],
-         }
-)
+         },
 
+      test_suite = 'nose.collector'
+
+)
