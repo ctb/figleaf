@@ -8,22 +8,22 @@ def thisfile():
 ### functions to run for tests
 
 def common():
-    print 0
+    print(0)
 
 def common2():
-    print 4
+    print(4)
 
 def a():
     common()
-    print 1
+    print(1)
 
 def b():
     common()
-    print 2
+    print(2)
 
 def c():
     common()
-    print 3
+    print(3)
 
 ###
 
@@ -67,9 +67,9 @@ def test():
     
     for i in ('a', 'b', 'c'):
         actual = figleaf.get_info(section_name=i).get(thisfile())
-        print '******', thisfile()
-        print 'section:', i, '; lines:', actual
-        print expected[i]
+        print('******', thisfile())
+        print('section:', i, '; lines:', actual)
+        print(expected[i])
 
         x = list(expected[i])
         x.sort()
@@ -77,7 +77,7 @@ def test():
         y = list(actual)
         y.sort()
 
-        print x, y
+        print(x, y)
         
         assert x == y                   # note: depends on absolute line no.
                                         # so don't shift lines in this file ;)
@@ -89,13 +89,13 @@ def test():
 
     in_common = list(in_common)
     in_common.sort()
-    print 'common:', in_common
+    print('common:', in_common)
 
     assert in_common == expected_in_common
 
     union = list(union)
     union.sort()
-    print 'union:', union
+    print('union:', union)
     
     assert union == expected_union
 

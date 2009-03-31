@@ -61,10 +61,10 @@ __version__ = "0.6.1"
 
 import sys
 import os
-from cPickle import dump, load
+from pickle import dump, load
 from optparse import OptionParser
 
-import internals
+from . import internals
 
 # use builtin sets if in >= 2.4, otherwise use 'sets' module.
 try:
@@ -119,7 +119,7 @@ def write_coverage(filename, append=True):
         old = {}
         fp = None
         try:
-            fp = open(filename)
+            fp = open(filename, 'rb')
         except IOError:
             pass
 
@@ -129,7 +129,7 @@ def write_coverage(filename, append=True):
             d = combine_coverage(d, old)
 
     # ok, save.
-    outfp = open(filename, 'w')
+    outfp = open(filename, 'wb')
     try:
         dump(d, outfp)
     finally:
@@ -139,7 +139,7 @@ def read_coverage(filename):
     """
     Read a coverage dictionary in from the given file.
     """
-    fp = open(filename)
+    fp = open(filename, 'rb')
     try:
         d = load(fp)
     finally:
@@ -196,7 +196,7 @@ def get_data():
 _t = None
 
 def init(exclude_path=None, include_only=None):
-    from internals import CodeTracer
+    from .internals import CodeTracer
     
     global _t
     if _t is None:
@@ -252,7 +252,7 @@ def get_info(section_name=None):
 def display_ast():
     l = internals.LineGrabber(open(sys.argv[1]))
     l.pretty_print()
-    print l.lines
+    print(l.lines)
 
 def main():
     """
@@ -307,3 +307,11 @@ def main():
         stop()                          # STOP code coverage
 
         write_coverage(os.path.join(cwd, '.figleaf'))
+
+def execfile(filename, maindict=None):
+    if maindict is None:
+        maindict = {}
+        
+    data = open(filename).read()
+    code = compile(data, filename, 'exec')
+    exec(code, maindict)

@@ -3,7 +3,7 @@ Common functions for annotating files with figleaf coverage information.
 """
 import sys, os
 from optparse import OptionParser
-import ConfigParser
+import configparser
 import re
 import logging
 
@@ -25,7 +25,7 @@ DEFAULT_CONFIGURE_FILE = ".figleafrc"
 def safe_conf_get(conf, section, name, default):
     try:
         val = conf.get(section, name)
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+    except (configparser.NoSectionError, configparser.NoOptionError):
         val = default
 
     return val
@@ -48,7 +48,7 @@ def configure(parser):
     parser.add_option("-v", "--verbose", action="store_true",
                       dest="verbose")
 
-    conf_file = ConfigParser.ConfigParser()
+    conf_file = configparser.ConfigParser()
     conf_file.read(CONFIG_FILE)         # ignores if not present
 
     default_coverage_file = safe_conf_get(conf_file,
@@ -88,16 +88,17 @@ def list(options, match=""):
     those files matching to the regexp 'match'.
     """
     if options.verbose:
-        print>>sys.stderr, '** Reading coverage from coverage file %s' % \
-                           (options.coverage_file,)
+        print('** Reading coverage from coverage file %s' % \
+              (options.coverage_file,), file=sys.stderr)
         if match:
-            print>>sys.stderr, '** Filtering against regexp "%s"' % (match,)
+            print('*** Filtering against regexp "%s"' % (match,),
+                  file=sys.stderr)
         
     coverage = figleaf.read_coverage(options.coverage_file)
     coverage = filter_coverage(coverage, match)
 
     for filename in coverage.keys():
-        print filename
+        print(filename)
 
 def list_sections(options, match=""):
     """
@@ -105,10 +106,11 @@ def list_sections(options, match=""):
     those files matching to the regexp 'match'.
     """
     if options.verbose:
-        print>>sys.stderr, '** Reading sections info from sections file %s' % \
-                           (options.sections_file,)
+        print('** Reading sections info from sections file %s' % \
+              (options.sections_file,), file=sys.stderr)
         if match:
-            print>>sys.stderr, '** Filtering against regexp "%s"' % (match,)
+            print('** Filtering against regexp "%s"' % (match,),
+                  file=sys.stderr)
 
     fp = open(options.sections_file)
     figleaf.load_pickled_coverage(fp) # @CTB
@@ -118,7 +120,7 @@ def list_sections(options, match=""):
     coverage = filter_coverage(coverage, match)
 
     for filename in coverage.keys():
-        print filename
+        print(filename)
 
 ###
 
@@ -210,9 +212,9 @@ def main():
     options, args = parser.parse_args()
 
     if not len(args):
-        print "ERROR: You must specify a command like 'list' or 'report'.  Use"
-        print "\n    %s -h\n" % (sys.argv[0],)
-        print "for help on commands and options."
+        print("ERROR: You must specify a command like 'list' or 'report'.  Use")
+        print("\n    %s -h\n" % (sys.argv[0],))
+        print("for help on commands and options.")
         sys.exit(-1)
         
     cmd = args.pop(0)

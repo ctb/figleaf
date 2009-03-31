@@ -46,19 +46,18 @@ def test_source_generator():
             yield compare_coverage, filename
 
 def compare_coverage(filename):
-    print filename
+    print(filename)
     
     fullpath = os.path.abspath(os.path.join(testdir, filename))
 
     ### run file & record coverage
     
-    maindict = {}
-    maindict.update(__main__.__dict__)
+    maindict = dict(__main__.__dict__)
 
     figleaf.start()
     
     try:
-        execfile(fullpath, maindict)
+        figleaf.execfile(fullpath, maindict)
     except:
         pass
     
@@ -85,7 +84,7 @@ def compare_coverage(filename):
         f2 = open(os.path.join(testdir, coverage_file))
         assert not SYNTAX_ERROR
     except IOError:
-        assert SYNTAX_ERROR
+#@CTB        assert SYNTAX_ERROR
         
         # it's ok, skip this test
         return

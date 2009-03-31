@@ -47,8 +47,8 @@ def findlinestarts(code):
     CTB -- swiped from Python 2.5, module 'dis', so that earlier versions
     of Python could use the function, too.
     """
-    byte_increments = [ord(c) for c in code.co_lnotab[0::2]]
-    line_increments = [ord(c) for c in code.co_lnotab[1::2]]
+    byte_increments = [c for c in code.co_lnotab[0::2]]
+    line_increments = [c for c in code.co_lnotab[1::2]]
 
     lastlineno = None
     lineno = code.co_firstlineno

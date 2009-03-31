@@ -3,7 +3,7 @@ Run some tests of the various command line programs.
 """
 
 import os, sys, shutil, tempfile
-import utils
+from . import utils
 
 testdir = os.path.dirname(__file__)
 
@@ -38,43 +38,48 @@ class Test_SimpleCommandLine:
         
     def test_annotate_no_args(self):
         status, out, errout = utils.run('figleaf-annotate')
-        assert out.startswith('ERROR')
+        assert out.startswith(b'ERROR')
 
     def test_basic_record(self):
         "Does figleaf record the proper thing?"
         # fail to list anything (no .figleaf file)
         status, out, errout = utils.run('figleaf-annotate', 'list', "tst-")
-        assert status != 0
+        assert status != 0, status
 
         # now run coverage...
         status, out, errout = utils.run('figleaf', 'tst-cover.py')
-        print out, errout
-        assert status == 0
+        print(out, errout)
+        assert status == 0, status
 
         # list *all* files
         status, out, errout = utils.run('figleaf-annotate', 'list')
-        assert status == 0
-        assert out.find("\ntst-cover.py\n")
+        assert status == 0, status
+        assert out.find(b"\ntst-cover.py\n")
 
         # list only the one file (matching 'tst-')
         status, out, errout = utils.run('figleaf-annotate', 'list', "tst-")
-        assert status == 0
-        assert out == "tst-cover.py\n", out
+        assert status == 0, status
+        assert out == b"tst-cover.py\n", out
 
     def test_annotate_coverage_filename(self):
         "Does the '-c' flag work for figleaf-annotate?"
 
         TEST_FILENAME = '.figleaf_blah'
+        try:
+            os.unlink(TEST_FILENAME)
+        except OSError:
+            pass
         
         # fail to list anything (no .figleaf_blah file)
         status, out, errout = utils.run('figleaf-annotate', 'list',
                                         '-c', TEST_FILENAME)
-        assert status != 0
+        print(out, errout)
+        assert status != 0, status
 
         # now run coverage...
         status, out, errout = utils.run('figleaf', 'tst-cover.py')
-        print out, errout
-        assert status == 0
+        print(out, errout)
+        assert status == 0, status
 
         # rename coverage output file
         os.rename('.figleaf', TEST_FILENAME)
@@ -82,8 +87,9 @@ class Test_SimpleCommandLine:
         # now list files that are covered in that recording...
         status, out, errout = utils.run('figleaf-annotate', 'list',
                                         '-c', TEST_FILENAME)
-        assert status == 0
-        assert out.find("\ntst-cover.py\n")
+        print(out, errout)
+        assert status == 0, status
+        assert out.find(b"\ntst-cover.py\n")
 
         # be sure to remove the file.
         os.unlink(TEST_FILENAME)
@@ -91,22 +97,22 @@ class Test_SimpleCommandLine:
     def test_figleaf_main_args(self):
         # now run coverage...
         status, out, errout = utils.run('figleaf')
-        print out, errout
+        print(out, errout)
         assert status != 0
         
         status, out, errout = utils.run('figleaf', 'tst-cover.py')
-        print out, errout
-        assert "ARGV: \n" in out
+        print(out, errout)
+        assert b"ARGV: \n" in out
         assert status == 0
         
         status, out, errout = utils.run('figleaf', 'tst-cover.py', 'a1', 'b2')
-        print out, errout
-        assert "ARGV: a1::b2\n" in out
+        print(out, errout)
+        assert b"ARGV: a1::b2\n" in out
         assert status == 0
 
         status, out, errout = utils.run('figleaf', 'tst-cover.py', '-a', 'b2')
-        print out, errout
-        assert "ARGV: -a::b2\n" in out
+        print(out, errout)
+        assert b"ARGV: -a::b2\n" in out
         assert status == 0
 
 class Test_Figleaf2HTML:
@@ -139,7 +145,7 @@ class Test_Figleaf2HTML:
         
         # run coverage...
         status, out, errout = utils.run('figleaf', 'tst-cover.py')
-        print out, errout
+        print(out, errout)
         assert status == 0
 
     tearDown = setUp
@@ -187,7 +193,7 @@ class Test_Figleaf2HTML:
         
         x = utils.run_check('figleaf2html', '-f', 'tst-cover.file-list', '-D')
         (status, out, errout) = x
-        print out, errout
+        print(out, errout)
 
         assert utils.does_dir_contain(self.htmldir,
                                       'index.html',
@@ -200,7 +206,7 @@ class Test_Figleaf2HTML:
         
         x = utils.run_check('figleaf2html', '-x', 'tst-cover.exclude', '-D')
         (status, out, errout) = x
-        print out, errout
+        print(out, errout)
 
         assert utils.does_dir_NOT_contain(self.htmldir,
                                           make_html_filename('tst-cover.py'))

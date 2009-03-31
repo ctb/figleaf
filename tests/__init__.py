@@ -1,7 +1,7 @@
 """
 Basic test fixtures for figleaf.
 """
-import sys, os
+import sys, os, imp
 
 thisdir = os.path.dirname(__file__)
 libdir = os.path.abspath(thisdir + '/..')
@@ -15,8 +15,8 @@ def setup():
     # figleaf egg in by default.)
     import figleaf
 
-    reload(sys.modules['figleaf'])
-    reload(sys.modules['figleaf.internals'])
+    imp.reload(sys.modules['figleaf'])
+    imp.reload(sys.modules['figleaf.internals'])
 
     assert libdir in figleaf.__file__
 

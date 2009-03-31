@@ -10,7 +10,7 @@ def test_dos_eol():
     import figleaf, figleaf.annotate_html
     
     figleaf.start()
-    execfile(os.path.join(thisdir, 'tst_dos_eol.py'))
+    figleaf.execfile(os.path.join(thisdir, 'tst_dos_eol.py'), {})
     figleaf.stop()
 
     coverage = figleaf.get_data().gather_files()

@@ -13,7 +13,7 @@ def run(program, *plus_args):
     args = [sys.executable, program]
     args.extend(plus_args)
 
-    print 'running', args
+    print('running', args)
 
     try:
         import subprocess
@@ -33,9 +33,9 @@ def run(program, *plus_args):
         out = outfp.read()
         errout = errfp.read()
 
-        print 'STATUS:', status
-        print 'OUT:', out
-        print 'ERROUT:', errout
+        print('STATUS:', status)
+        print('OUT:', out)
+        print('ERROUT:', errout)
 
         return (status, out, errout)
         
@@ -52,10 +52,10 @@ def does_dir_contain(dirname, *query_files, **kw):
     # get list of files; kludgy!
     actual_files = [ c for (a, b, c,) in os.walk(dirname) if a == dirname ][0]
 
-    print ' --- does dir contain', dirname
-    print 'QUERY FILES:', query_files
-    print 'ACTUAL FILES:', actual_files
-    print ' --- '
+    print(' --- does dir contain', dirname)
+    print('QUERY FILES:', query_files)
+    print('ACTUAL FILES:', actual_files)
+    print(' --- ')
     
     for testfile in query_files:
         if testfile not in actual_files:
@@ -73,10 +73,10 @@ def does_dir_NOT_contain(dirname, *query_files):
     # get list of files; kludgy!
     actual_files = [ c for (a, b, c,) in os.walk(dirname) if a == dirname ][0]
 
-    print ' --- does dir NOT contain', dirname
-    print 'QUERY FILES:', query_files
-    print 'ACTUAL FILES:', actual_files
-    print ' --- '
+    print(' --- does dir NOT contain', dirname)
+    print('QUERY FILES:', query_files)
+    print('ACTUAL FILES:', actual_files)
+    print(' --- ')
     
     for testfile in query_files:
         if testfile in actual_files:

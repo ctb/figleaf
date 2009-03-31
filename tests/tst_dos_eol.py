@@ -1,5 +1,5 @@
 """this is a multiline file"""
 
-print 'hello, world'
+print('hello, world')
 
-print 'yo'
+print('yo')

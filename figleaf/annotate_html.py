@@ -51,14 +51,12 @@ def annotate_file(fp, lines, covered):
     return output, n_covered, n_lines, percent
 
 def write_html_summary(info_dict, directory):
-    info_dict_items = info_dict.items()
+    info_dict_items = list(info_dict.items())
 
-    def sort_by_percent(a, b):
-        a = a[1][2]
-        b = b[1][2]
-
-        return -cmp(a,b)
-    info_dict_items.sort(sort_by_percent)
+    def sort_key(a):
+        return -a[1][2]
+    
+    info_dict_items.sort(key=sort_key)
 
     summary_lines = sum([ v[0] for (k, v) in info_dict_items])
     summary_cover = sum([ v[1] for (k, v) in info_dict_items])
@@ -136,7 +134,7 @@ def report_as_html(coverage, directory, exclude_patterns, files_list,
         except IOError:
             logger.error('CANNOT OPEN: %s' % (pyfile,))
             continue
-        except Exception, e:
+        except Exception as e:
             logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
             continue
 
@@ -285,4 +283,4 @@ def main():
     prepare_reportdir(options.output_dir)
     report_as_html(coverage, options.output_dir, exclude, files_list)
 
-    print 'figleaf: HTML output written to %s' % (options.output_dir,)
+    print('figleaf: HTML output written to %s' % (options.output_dir,))

@@ -13,7 +13,7 @@ class TestInclude:
         figleaf.init(None, 'tests')
         figleaf.start()
 
-        execfile('tests/tst_include1.py')
+        figleaf.execfile('tests/tst_include1.py')
 
         figleaf.stop()
 
@@ -27,7 +27,7 @@ class TestInclude:
         figleaf.init(None, None)
         figleaf.start()
 
-        execfile('tests/tst_include1.py')
+        figleaf.execfile('tests/tst_include1.py')
 
         figleaf.stop()
 

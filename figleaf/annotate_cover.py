@@ -2,7 +2,7 @@ import figleaf
 import os
 import re
 
-from annotate import read_exclude_patterns, filter_files, logger
+from .annotate import read_exclude_patterns, filter_files, logger
 
 def report_as_cover(coverage, exclude_patterns=[], ):
     ### now, output.
@@ -19,7 +19,7 @@ def report_as_cover(coverage, exclude_patterns=[], ):
             continue
         except KeyboardInterrupt:
             raise
-        except Exception, e:
+        except Exception as e:
             logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
             continue
 
@@ -50,15 +50,12 @@ def report_as_cover(coverage, exclude_patterns=[], ):
 
     ### print a summary, too.
 
-    info_dict_items = info_dict.items()
+    info_dict_items = list(info_dict.items())
 
-    def sort_by_pcnt(a, b):
-        a = a[1][2]
-        b = b[1][2]
+    def pcnt_key(a):
+        return -a[1][2]
 
-        return -cmp(a,b)
-
-    info_dict_items.sort(sort_by_pcnt)
+    info_dict_items.sort(key=pcnt_key)
 
     logger.info('reported on %d file(s) total\n' % len(info_dict))
     return len(info_dict)
