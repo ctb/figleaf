@@ -148,6 +148,7 @@ def read_files_list(filename):
     for line in open(filename):
         f = line.strip()
         s[os.path.abspath(f)] = 1
+        s[os.path.realpath(f)] = 1
 
     return s
 
@@ -156,27 +157,28 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
 
     # list of files specified?
     if files_list:
+        for filename in filenames:
+            try:
+                del files_list[os.path.realpath(filename)]
+                yield os.path.abspath(filename)
+            except KeyError:
+                logger.info('SKIPPING %s -- not in files list' % (filename,))
+                
         for filename in files_list.keys():
             yield filename
 
-        filenames = [ os.path.abspath(x) for x in filenames ]
-        for filename in filenames:
-            try:
-                del files_list[filename]
-            except KeyError:
-                logger.info('SKIPPING %s -- not in files list' % (filename,))
-            
         return
 
     ### no files list given -- handle differently
 
     for filename in filenames:
         abspath = os.path.abspath(filename)
+        realpath = os.path.realpath(filename)
         
         # check to see if we match anything in the exclude_patterns list
         skip = False
         for pattern in exclude_patterns:
-            if pattern.search(filename):
+            if pattern.search(abspath) or pattern.search(realpath):
                 logger.info('SKIPPING %s -- matches exclusion pattern' % \
                             (filename,))
                 skip = True
@@ -199,7 +201,7 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
         if filename.startswith('<doctest '):
             continue
 
-        yield filename
+        yield abspath
 
 ###
 
