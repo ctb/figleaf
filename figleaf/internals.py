@@ -63,7 +63,7 @@ def findlinestarts(code):
     if lineno != lastlineno:
         yield (addr, lineno)
 
-class CodeTracer:
+class CodeTracer(object):
     """
     Basic mechanisms for code coverage tracking, using sys.settrace.  
     """
@@ -129,7 +129,7 @@ class CodeTracer:
     def _threading_settrace(self, f, e, a):
         self.c.enable()
 
-class CoverageData:
+class CoverageData(object):
     """
     A class to manipulate and combine data from the CodeTracer object.
 
