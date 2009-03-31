@@ -1,0 +1,8 @@
++ g = h = i = 1
++ def fn():
+0     global g
+0     global h, \
+0         i
++     g = h = i = 2
++ fn()
++ assert g == 2 and h == 2 and i == 2
