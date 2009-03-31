@@ -3,3 +3,6 @@
 build
 _coverage.so
 figleaf.egg-info
+.figleaf_sections
+.figleaf
+dist
