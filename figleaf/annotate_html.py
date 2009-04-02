@@ -118,7 +118,7 @@ def write_html_summary(info_dict, directory):
     
 
 def report_as_html(coverage, directory, exclude_patterns, files_list,
-                   extra_files=None):
+                   extra_files=None, include_zero=True):
     """
     Write an HTML report on all of the files, plus a summary.
     """
@@ -143,7 +143,13 @@ def report_as_html(coverage, directory, exclude_patterns, files_list,
         # initialize
         covered = coverage.get(pyfile, set())
 
-        line_info[pyfile] = (lines, covered)
+        realpath = os.path.realpath(pyfile)
+
+        (old_l, old_c) = line_info.get(realpath, (set(), set()))
+        lines.update(old_l)
+        covered.update(old_c)
+
+        line_info[realpath] = (lines, covered)
 
     if extra_files:
         for (otherfile, lines, covered) in extra_files:
@@ -164,6 +170,9 @@ def report_as_html(coverage, directory, exclude_patterns, files_list,
 
         # annotate
         output, n_covered, n_lines, percent = annotate_file(fp, lines, covered)
+
+        if not include_zero and n_covered == 0:
+            continue
 
         # summarize
         info_dict[filename] = (n_lines, n_covered, percent)
@@ -247,6 +256,10 @@ def main():
                              dest='debug',
                              help='Show all debugging messages')
 
+    option_parser.add_option('-z', '--no-zero', action='store_true',
+                             dest='no_zero',
+                             help='Omit files with zero lines covered.')
+
     (options, args) = option_parser.parse_args()
 
     if options.quiet:
@@ -283,6 +296,7 @@ def main():
 
     ### make directory
     prepare_reportdir(options.output_dir)
-    report_as_html(coverage, options.output_dir, exclude, files_list)
+    report_as_html(coverage, options.output_dir, exclude, files_list,
+                   include_zero=not options.no_zero)
 
     print 'figleaf: HTML output written to %s' % (options.output_dir,)
