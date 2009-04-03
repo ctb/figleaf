@@ -1,16 +1,12 @@
 TODO -- test exclude
 
-figleaf-annotate list
-figleaf-annotate sections
-figleaf-annotate summarize
-
 .figleafrc
 
 include vs exclude: include only, exclude precisely
 
 no cover directive
 
-mv nose plugins into figleaf
+---
 
-figleaf-annotate send
-figleaf-annotate push
+Record stack depth of coverage (Tim Hatch)
+Time-series analysis - timestamp coverage

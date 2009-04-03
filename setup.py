@@ -1,3 +1,7 @@
+"""
+setuptools config file for figleaf.
+"""
+
 try:
     import setuptools
 except ImportError:

@@ -13,8 +13,14 @@ also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.
 
 ---
 
-remove annotate.py unused functions.
+no 2.3; is set in 2.4?
+
+--
+
+docs & tests for
+ - figleaf sections plugin & annotation
+ - figleaf plugin
 
 ---
 
-no 2.3
+rb/wb stuff for py3k pickle
