@@ -1,19 +1,29 @@
 """
-@CTB
+HTML annotation of figleaf results.
+
+Functions:
+ - annotate_file
+ - write_html_summary
+ - report_as_html
+ - prepare_reportdir
+ - make_html_filename
+ - escape_html
 """
 import os
 import re
 
 import figleaf
-from figleaf.annotate import read_exclude_patterns, filter_files, logger, \
-     read_files_list
+from figleaf import annotate
+from figleaf.annotate import logger
 
 from figleaf.compat import set
 
 ###
 
 def annotate_file(fp, lines, covered):
-    # initialize
+    """Take file pointer & sets of covered/uncovered lines, turn into HTML."""
+    
+    # initialize stats
     n_covered = n_lines = 0
 
     output = []
@@ -112,7 +122,6 @@ def write_html_summary(info_dict, directory):
 
     index_fp.write('</table>\n')
     index_fp.close()
-    
 
 def report_as_html(coverage, directory, exclude_patterns, files_list,
                    extra_files=None, include_zero=True):
@@ -121,32 +130,9 @@ def report_as_html(coverage, directory, exclude_patterns, files_list,
     """
 
     ### assemble information.
-
-    keys = coverage.keys()
-    line_info = {}
-    for pyfile in filter_files(keys, exclude_patterns, files_list):
-        try:
-            fp = open(pyfile, 'rU')
-            lines = figleaf.get_lines(fp)
-        except KeyboardInterrupt:
-            raise
-        except IOError:
-            logger.error('CANNOT OPEN: %s' % (pyfile,))
-            continue
-        except Exception, e:
-            logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
-            continue
-
-        # initialize
-        covered = coverage.get(pyfile, set())
-
-        realpath = os.path.realpath(pyfile)
-
-        (old_l, old_c) = line_info.get(realpath, (set(), set()))
-        lines.update(old_l)
-        covered.update(old_c)
-
-        line_info[realpath] = (lines, covered)
+    
+    line_info = annotate.build_python_coverage_info(coverage, exclude_patterns,
+                                                    files_list)
 
     if extra_files:
         for (otherfile, lines, covered) in extra_files:
@@ -237,7 +223,7 @@ def main():
     import sys
     import logging
     from optparse import OptionParser
-    
+
     ###
 
     usage = "usage: %prog [options] [coverage files ... ]"
@@ -296,11 +282,11 @@ def main():
 
     exclude = []
     if options.exclude_patterns_file:
-        exclude = read_exclude_patterns(options.exclude_patterns_file)
+        exclude = annotate.read_exclude_patterns(options.exclude_patterns_file)
 
     files_list = {}
     if options.files_list:
-        files_list = read_files_list(options.files_list)
+        files_list = annotate.read_files_list(options.files_list)
 
     ### make directory
     prepare_reportdir(options.output_dir)

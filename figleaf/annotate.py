@@ -4,6 +4,7 @@ Common functions for annotating files with figleaf coverage information.
  - read_exclude_patterns
  - read_files_list
  - filter_files
+ - canonicalize filename
 
 """
 import sys, os
@@ -109,3 +110,35 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
             continue
 
         yield realpath
+
+def build_python_coverage_info(coverage, exclude_patterns, files_list):
+    keys = coverage.keys()
+    
+    line_info = {}
+    for pyfile in filter_files(keys, exclude_patterns, files_list):
+        try:
+            fp = open(pyfile, 'rU')
+            lines = figleaf.get_lines(fp)
+        except KeyboardInterrupt:
+            raise
+        except IOError:
+            logger.error('CANNOT OPEN: %s' % (pyfile,))
+            continue
+        except Exception, e:
+            logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
+            continue
+
+        # retrieve the coverage and merge into a realpath-based filename.
+        covered = coverage.get(pyfile, set())
+        realpath = os.path.realpath(pyfile)
+
+        # be careful not to overwrite existing coverage for different
+        # filenames that may have been canonicalized.
+        (old_l, old_c) = line_info.get(realpath, (set(), set()))
+        lines.update(old_l)
+        covered.update(old_c)
+
+        line_info[realpath] = (lines, covered)
+
+    return line_info
+    
