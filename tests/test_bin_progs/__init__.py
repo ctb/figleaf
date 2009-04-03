@@ -35,58 +35,6 @@ class Test_SimpleCommandLine:
             pass
 
     tearDown = setUp
-        
-    def test_annotate_no_args(self):
-        status, out, errout = utils.run('figleaf-annotate')
-        assert out.startswith('ERROR')
-
-    def test_basic_record(self):
-        "Does figleaf record the proper thing?"
-        # fail to list anything (no .figleaf file)
-        status, out, errout = utils.run('figleaf-annotate', 'list', "tst-")
-        assert status != 0
-
-        # now run coverage...
-        status, out, errout = utils.run('figleaf', 'tst-cover.py')
-        print out, errout
-        assert status == 0
-
-        # list *all* files
-        status, out, errout = utils.run('figleaf-annotate', 'list')
-        assert status == 0
-        assert out.find("\ntst-cover.py\n")
-
-        # list only the one file (matching 'tst-')
-        status, out, errout = utils.run('figleaf-annotate', 'list', "tst-")
-        assert status == 0
-        assert out == "tst-cover.py\n", out
-
-    def test_annotate_coverage_filename(self):
-        "Does the '-c' flag work for figleaf-annotate?"
-
-        TEST_FILENAME = '.figleaf_blah'
-        
-        # fail to list anything (no .figleaf_blah file)
-        status, out, errout = utils.run('figleaf-annotate', 'list',
-                                        '-c', TEST_FILENAME)
-        assert status != 0
-
-        # now run coverage...
-        status, out, errout = utils.run('figleaf', 'tst-cover.py')
-        print out, errout
-        assert status == 0
-
-        # rename coverage output file
-        os.rename('.figleaf', TEST_FILENAME)
-
-        # now list files that are covered in that recording...
-        status, out, errout = utils.run('figleaf-annotate', 'list',
-                                        '-c', TEST_FILENAME)
-        assert status == 0
-        assert out.find("\ntst-cover.py\n")
-
-        # be sure to remove the file.
-        os.unlink(TEST_FILENAME)
 
     def test_figleaf_main_args(self):
         # now run coverage...

@@ -1,17 +1,9 @@
 """
 Common functions for annotating files with figleaf coverage information.
 
- - filter_coverage
  - read_exclude_patterns
  - read_files_list
  - filter_files
-
-@CTB remove?
- - safe_conf_get
- - configure
- - list
- - list_sections
- - main
 
 """
 import sys, os
@@ -36,106 +28,6 @@ logger = logging.getLogger('figleaf.annotate')
 DEFAULT_CONFIGURE_FILE = ".figleafrc"
 
 ### utilities
-
-def safe_conf_get(conf, section, name, default):
-    try:
-        val = conf.get(section, name)
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        val = default
-
-    return val
-
-def configure(parser):
-    """
-    Configure the optparse.OptionParser object with defaults, optionally
-    loaded from a configuration file.
-    """
-    CONFIG_FILE = os.environ.get('FIGLEAFRC', DEFAULT_CONFIGURE_FILE)
-    
-    parser.add_option("-c", "--coverage-file", action="store",
-                       type="string", dest="coverage_file",
-                       help="File containing figleaf coverage information.")
-    
-    parser.add_option("-s", "--sections-file", action="store",
-                       type="string", dest="sections_file",
-                       help="File containing figleaf sections coverage info.")
-
-    parser.add_option("-v", "--verbose", action="store_true",
-                      dest="verbose")
-
-    conf_file = ConfigParser.ConfigParser()
-    conf_file.read(CONFIG_FILE)         # ignores if not present
-
-    default_coverage_file = safe_conf_get(conf_file,
-                                          'figleaf', 'coverage_file',
-                                          '.figleaf')
-    default_sections_file = safe_conf_get(conf_file,
-                                          'figleaf', 'sections_file',
-                                          '.figleaf_sections')
-    default_verbose = int(safe_conf_get(conf_file, 'figleaf', 'verbose',
-                                        0))
-
-    parser.set_defaults(coverage_file=default_coverage_file,
-                        sections_file=default_sections_file,
-                        verbose=default_verbose)
-
-def filter_coverage(coverage, re_match):
-    """
-    ...
-    """
-    if not re_match:
-        return coverage
-
-    regexp = re.compile(re_match)
-    
-    d = {}
-    for filename, lines in coverage.items():
-        if regexp.match(filename):
-            d[filename] = lines
-            
-    return d
-
-### commands
-
-def list(options, match=""):
-    """
-    List the filenames in the coverage file, optionally limiting it to
-    those files matching to the regexp 'match'.
-    """
-    if options.verbose:
-        print>>sys.stderr, '** Reading coverage from coverage file %s' % \
-                           (options.coverage_file,)
-        if match:
-            print>>sys.stderr, '** Filtering against regexp "%s"' % (match,)
-        
-    coverage = figleaf.read_coverage(options.coverage_file)
-    coverage = filter_coverage(coverage, match)
-
-    for filename in coverage.keys():
-        print filename
-
-def list_sections(options, match=""):
-    """
-    List the filenames in the coverage file, optionally limiting it to
-    those files matching to the regexp 'match'.
-    """
-    if options.verbose:
-        print>>sys.stderr, '** Reading sections info from sections file %s' % \
-                           (options.sections_file,)
-        if match:
-            print>>sys.stderr, '** Filtering against regexp "%s"' % (match,)
-
-    fp = open(options.sections_file)
-    figleaf.load_pickled_coverage(fp) # @CTB
-
-    data = figleaf.internals.CoverageData(figleaf._t)
-    coverage = data.gather_files()
-    coverage = filter_coverage(coverage, match)
-
-    for filename in coverage.keys():
-        print filename
-
-###
 
 def read_exclude_patterns(filename):
     """
@@ -217,26 +109,3 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
             continue
 
         yield realpath
-
-###
-
-def main():
-    parser = OptionParser()
-    configure(parser)
-    
-    options, args = parser.parse_args()
-
-    if not len(args):
-        print "ERROR: You must specify a command like 'list' or 'report'.  Use"
-        print "\n    %s -h\n" % (sys.argv[0],)
-        print "for help on commands and options."
-        sys.exit(-1)
-        
-    cmd = args.pop(0)
-
-    if cmd == 'list':
-        list(options, *args)
-    elif cmd == 'list_sections':
-        list_sections(options, *args)
-
-    sys.exit(0)
