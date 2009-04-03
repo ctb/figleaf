@@ -117,7 +117,7 @@ def write_coverage(filename, append=True):
         old = {}
         fp = None
         try:
-            fp = open(filename)
+            fp = open(filename, 'rb')
         except IOError:
             pass
 
@@ -127,7 +127,7 @@ def write_coverage(filename, append=True):
             d = combine_coverage(d, old)
 
     # ok, save.
-    outfp = open(filename, 'w')
+    outfp = open(filename, 'wb')
     try:
         dump(d, outfp)
     finally:
@@ -137,7 +137,7 @@ def read_coverage(filename):
     """
     Read a coverage dictionary in from the given file.
     """
-    fp = open(filename)
+    fp = open(filename, 'rb')
     try:
         d = load(fp)
     finally:
@@ -248,7 +248,7 @@ def get_info(section_name=None):
 #############
 
 def display_ast():
-    l = internals.LineGrabber(open(sys.argv[1]))
+    l = internals.LineGrabber(open(sys.argv[1]), 'rU')
     l.pretty_print()
     print l.lines
 

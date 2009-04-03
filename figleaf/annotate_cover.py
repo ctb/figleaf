@@ -32,7 +32,7 @@ def report_as_cover(coverage, exclude_patterns=[], ):
         # ok, got all the info.  now annotate file ==> html.
 
         covered = coverage[k]
-        pyfile = open(k)
+        pyfile = open(k, 'rU')
         (n_covered, n_lines, output) = make_cover_lines(lines, covered, pyfile)
 
 

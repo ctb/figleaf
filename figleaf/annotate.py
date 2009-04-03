@@ -39,7 +39,7 @@ def read_exclude_patterns(filename):
 
     exclude_patterns = []
 
-    fp = open(filename)
+    fp = open(filename, 'rU')
     for line in fp:
         line = line.rstrip()
         if line and not line.startswith('#'):

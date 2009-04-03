@@ -20,6 +20,6 @@ except NameError:
         if maindict is None:
             maindict = {}
 
-        data = open(filename).read()
+        data = open(filename).read('rU')
         code = compile(data, filename, 'exec')
         exec(code, maindict)
