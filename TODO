@@ -10,3 +10,11 @@ for k in 'types', 'symbol', 'sre_constants', 'keyword':
 ---
 
 also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.
+
+---
+
+remove annotate.py unused functions.
+
+---
+
+no 2.3

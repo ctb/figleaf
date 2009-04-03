@@ -6,8 +6,6 @@ with which with test was being run at the time.  Can be used to
 produce a "barcode" of code execution.
 """
 
-#@CTB version req!
-
 DEFAULT_COVERAGE_FILE='.figleaf_sections'
 import pkg_resources
 
@@ -16,9 +14,6 @@ try:
     import figleaf
 except ImportError:
     figleaf = None
-
-import sys
-err = sys.stderr
 
 import nose.case
 from nose.plugins.base import Plugin

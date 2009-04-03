@@ -4,21 +4,18 @@ Coverage tracking internals.
 
 import sys
 import threading
-
-err = sys.stderr
-
 import types, symbol
+
+###
+
+from compat import set
 
 try:
     from _coverage import Collector
 except ImportError:
     Collector = None
 
-# use builtin sets if in >= 2.4, otherwise use 'sets' module.
-try:
-    set()
-except NameError:
-    from sets import Set as set
+###
 
 def get_interesting_lines(code):
     """

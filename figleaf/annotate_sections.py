@@ -1,33 +1,16 @@
-#! /usr/bin/env python
+"""
+Functions for section-based annotation.
+
+@CTB move util functions from annotate_html into here?
+"""
+
+import os
+
 import figleaf
 from figleaf import internals
-from sets import Set as set
-import sys
-from cPickle import load
-import os
-from optparse import OptionParser
+from figleaf.compat import set
 
-def main():
-    #### OPTIONS
-
-    parser = OptionParser()
-
-    parser.add_option('-c', '--coverage', nargs=1, action="store",
-                      dest="coverage_file", 
-                      help = 'load coverage info from this file',
-                      default='.figleaf_sections')
-
-    ####
-
-    (options, args) = parser.parse_args(sys.argv[1:])
-    coverage_file = options.coverage_file
-    
-    figleaf.load_pickled_coverage(open(coverage_file))
-    data = internals.CoverageData(figleaf._t)
-    full_cov = data.gather_files()
-
-    for filename in args:
-        annotate_file_with_sections(filename, data, full_cov)
+###
 
 def annotate_file_with_sections(short, data, full_cov):
     full = os.path.abspath(short)
@@ -77,3 +60,31 @@ def annotate_file_with_sections(short, data, full_cov):
         fp.write('%s  | %s' % (marks, line))
     
     fp.close()
+
+def main():
+    """
+    Setuptools entry point for annotate-sections; see setup.py
+    """
+    import sys
+    from optparse import OptionParser
+    
+    #### OPTIONS
+
+    parser = OptionParser()
+
+    parser.add_option('-c', '--coverage', nargs=1, action="store",
+                      dest="coverage_file", 
+                      help = 'load coverage info from this file',
+                      default='.figleaf_sections')
+
+    ####
+
+    (options, args) = parser.parse_args(sys.argv[1:])
+    coverage_file = options.coverage_file
+    
+    figleaf.load_pickled_coverage(open(coverage_file))
+    data = internals.CoverageData(figleaf._t)
+    full_cov = data.gather_files()
+
+    for filename in args:
+        annotate_file_with_sections(filename, data, full_cov)

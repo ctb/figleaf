@@ -13,9 +13,6 @@ try:
 except ImportError:
     figleaf = None
 
-import sys
-err = sys.stderr
-
 import nose.case
 from nose.plugins.base import Plugin
 

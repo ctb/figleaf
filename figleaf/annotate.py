@@ -20,6 +20,8 @@ import ConfigParser
 import re
 import logging
 
+from compat import set
+
 import figleaf
 
 thisdir = os.path.dirname(__file__)

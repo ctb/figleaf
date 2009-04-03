@@ -1,15 +1,14 @@
-import figleaf
+"""
+@CTB
+"""
 import os
 import re
 
-# use builtin sets if in >= 2.4, otherwise use 'sets' module.
-try:
-    set()
-except NameError:
-    from sets import Set as set
-
+import figleaf
 from figleaf.annotate import read_exclude_patterns, filter_files, logger, \
      read_files_list
+
+from figleaf.compat import set
 
 ###
 
@@ -53,12 +52,10 @@ def annotate_file(fp, lines, covered):
 def write_html_summary(info_dict, directory):
     info_dict_items = info_dict.items()
 
-    def sort_by_percent(a, b):
-        a = a[1][2]
-        b = b[1][2]
+    def pcnt_key(a):
+        return -a[1][2]
 
-        return -cmp(a,b)
-    info_dict_items.sort(sort_by_percent)
+    info_dict_items.sort(key=pcnt_key)
 
     summary_lines = sum([ v[0] for (k, v) in info_dict_items])
     summary_cover = sum([ v[1] for (k, v) in info_dict_items])
@@ -220,16 +217,27 @@ def make_html_filename(orig):
     return orig
 
 def escape_html(s):
+    """
+    @CTB rather inadequate, no? ;)
+    """
     s = s.replace("&", "&amp;")
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")
     s = s.replace('"', "&quot;")
     return s
 
+###
+
 def main():
+    """
+    Command-line function to do HTML annotation (red/green).
+
+    Setuptools entry-point for figleaf2cov; see setup.py.
+    """
     import sys
     import logging
     from optparse import OptionParser
+    
     ###
 
     usage = "usage: %prog [options] [coverage files ... ]"

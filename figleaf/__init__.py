@@ -65,12 +65,10 @@ from cPickle import dump, load
 from optparse import OptionParser
 
 import internals
+import compat
+from compat import set, do_execfile
 
-# use builtin sets if in >= 2.4, otherwise use 'sets' module.
-try:
-    set()
-except NameError:
-    from sets import Set as set
+###
 
 def get_lines(fp):
     """
@@ -302,7 +300,7 @@ def main():
 
     import __main__
     try:
-        execfile(sys.argv[0], __main__.__dict__)
+        do_execfile(sys.argv[0], __main__.__dict__)
     finally:
         stop()                          # STOP code coverage
 
