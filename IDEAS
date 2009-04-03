@@ -10,3 +10,7 @@ no cover directive
 
 Record stack depth of coverage (Tim Hatch)
 Time-series analysis - timestamp coverage
+
+--
+
+hook into gettrace
