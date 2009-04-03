@@ -20,7 +20,7 @@ from figleaf.compat import set
 
 ###
 
-def annotate_file(fp, lines, covered):
+def annotate_file_html(fp, lines, covered):
     """Take file pointer & sets of covered/uncovered lines, turn into HTML."""
     
     # initialize stats
@@ -152,7 +152,9 @@ def report_as_html(coverage, directory, exclude_patterns, files_list,
         fp.seek(0)
 
         # annotate
-        output, n_covered, n_lines, percent = annotate_file(fp, lines, covered)
+        output, n_covered, n_lines, percent = annotate_file_html(fp,
+                                                                 lines,
+                                                                 covered)
 
         if not include_zero and n_covered == 0:
             continue

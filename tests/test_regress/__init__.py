@@ -6,7 +6,8 @@ import sys
 import os
 import imp
 import __main__
-import figleaf, figleaf.annotate_cover
+import figleaf
+from figleaf import annotate_cover
 
 version_string = ".".join([ str(x) for x in sys.version_info[:2] ])
 
@@ -98,8 +99,8 @@ def compare_coverage(filename):
     ### annotate lines with coverage style 'cover'
     
     f1.seek(0)
-    (_, _, output) = figleaf.annotate_cover.make_cover_lines(line_info,
-                                                             coverage_info, f1)
+    (_, _, output) = annotate_cover.annotate_file_cov(f1, line_info,
+                                                      coverage_info)
 
     ### compare!
     

@@ -10,30 +10,24 @@ import re
 
 from annotate import read_exclude_patterns, filter_files, logger
 
-def report_as_cover(coverage, exclude_patterns=[], ):
-    ### now, output.
+def report_as_cover(coverage, directory, exclude_patterns, files_list,
+                    extra_files=None, include_zero=True):
 
-    keys = coverage.keys()
+    ### assemble information
+
+    line_info = annotate.build_python_coverage_info(coverage,
+                                                    exclude_patterns,
+                                                    files_list)
+
+    if extra_files:
+        for (otherfile, lines, covered) in extra_files:
+            line_info[otherfile] = (lines, covered)
+
     info_dict = {}
-    
-    for k in filter_files(keys):
-        try:
-            pyfile = open(k, 'rU')
-            lines = figleaf.get_lines(pyfile)
-        except IOError:
-            logger.warning('CANNOT OPEN: %s' % k)
-            continue
-        except KeyboardInterrupt:
-            raise
-        except Exception, e:
-            logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
-            continue
-
-        # ok, got all the info.  now annotate file ==> html.
-
+    for filename, (lines, covered) in line_info.items():
         covered = coverage[k]
-        pyfile = open(k, 'rU')
-        (n_covered, n_lines, output) = make_cover_lines(lines, covered, pyfile)
+        fp = open(k, 'rU')
+        (n_covered, n_lines, output) = annotate_file_cov(fp, lines, covered)
 
 
         try:
@@ -66,7 +60,7 @@ def report_as_cover(coverage, exclude_patterns=[], ):
     logger.info('reported on %d file(s) total\n' % len(info_dict))
     return len(info_dict)
 
-def make_cover_lines(line_info, coverage_info, fp):
+def annotate_file_cov(fp, line_info, coverage_info):
     n_covered = n_lines = 0
     output = []
     
