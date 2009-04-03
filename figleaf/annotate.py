@@ -1,5 +1,18 @@
 """
 Common functions for annotating files with figleaf coverage information.
+
+ - filter_coverage
+ - read_exclude_patterns
+ - read_files_list
+ - filter_files
+
+@CTB remove?
+ - safe_conf_get
+ - configure
+ - list
+ - list_sections
+ - main
+
 """
 import sys, os
 from optparse import OptionParser
@@ -201,7 +214,7 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
         if filename.startswith('<doctest '):
             continue
 
-        yield abspath
+        yield realpath
 
 ###
 
