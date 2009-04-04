@@ -29,6 +29,7 @@ setup(name = 'figleaf',
             'figleaf2html = figleaf.annotate_html:main',
             'figleaf2cov = figleaf.annotate_cover:main',
             'figleaf2ast = figleaf:display_ast',
+            'figleaf-report = figleaf.report_text:main',
             'annotate-sections = figleaf.annotate_sections:main',
         ],
         'nose.plugins.0.10': [
