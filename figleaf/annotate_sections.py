@@ -82,7 +82,7 @@ def main():
     (options, args) = parser.parse_args(sys.argv[1:])
     coverage_file = options.coverage_file
     
-    figleaf.load_pickled_coverage(open(coverage_file), 'rb')
+    figleaf.load_pickled_coverage(open(coverage_file, 'rb'))
     data = internals.CoverageData(figleaf._t)
     full_cov = data.gather_files()
 

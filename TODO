@@ -23,4 +23,8 @@ docs & tests for
 
 ---
 
-annotate/cover stuff; filename canonicalization.
+annotate/cover stuff; filename canonicalization?
+
+---
+
+does sections coverage miss out on top-level stuff??

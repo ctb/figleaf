@@ -116,7 +116,39 @@ the ``-D`` option changes the logging mode to print all messages.
 Sections
 ========
 
-@CTB - to be written -
+Figleaf section recording lets you parcel up coverage results by
+"sections" in your code.  This can be useful if you want to figure
+out what code is being run by which test(s); you can also parametrize
+your code and figure out where your code paths may be overlapping.
+
+The basic API is pretty simple: ``start_section(name)`` starts
+coverage recording under the given section name, and ``stop_section``
+stops coverage recording under that section.  Before ``start_section``
+and after ``stop_section`` coverage results are recorded the way
+they normally are in figleaf.
+
+You can use the 'annotate-sections' script to annotate specific source
+files with the sections information.
+
+You can also use the 'figleaf-sections' nose plug-in to run your tests
+and record section coverage for each test.
+
+Example
+-------
+
+Manual addition of coverage information: ::
+
+   python examples/example-sections.py
+   annotate-sections examples/example-sections.py
+
+then look at the file 'examples/examples-sections.py.sections'.
+
+Alternatively, to try the nose plug-in:
+
+   nosetests --with-figleafsections examples/test_nose_sections.py
+   annotate-sections examples/test_nose_sections.py
+
+and then look at the file 'examples/test_nose_sections.py.sections'.
 
 sections file vs coverage file
 ==============================
