@@ -81,7 +81,10 @@ class CodeTracer(object):
         """
         wipe out coverage info
         """
-        self.c.clear()
+        self.common = self.c = Collector(self.exclude_prefix,
+                                         self.include_only_prefix)
+        self.sections = {}
+        self.section_name = None
 
     def start_section(self, name):
         self.stop_section()

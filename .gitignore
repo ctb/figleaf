@@ -6,3 +6,6 @@ figleaf.egg-info
 .figleaf_sections
 .figleaf
 dist
+.DS_Store
+*.sections
+*.cover

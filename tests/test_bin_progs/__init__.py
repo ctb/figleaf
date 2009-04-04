@@ -7,6 +7,8 @@ import utils
 
 testdir = os.path.dirname(__file__)
 
+import figleaf
+
 cwd = None
 def setup():
     global cwd
@@ -200,3 +202,36 @@ class Test_Figleaf2HTML:
 
         assert utils.does_dir_NOT_contain(self.htmldir,
                                           make_html_filename('tst-cover.py'))
+
+class Test_Sections:
+    """
+    Test the annotat-sections script.
+    """
+    def setUp(self):
+        try:
+            os.unlink('.figleaf_sections')
+        except OSError:
+            pass
+
+    tearDown = setUp
+
+    def test_figleaf_main_args(self):
+        # run the sections-generating script
+        figleaf.start()
+        figleaf._t.clear()
+        
+        execfile('tst-sections.py')
+        
+        fp = open('.figleaf_sections', 'wb')
+        figleaf.dump_pickled_coverage(fp)
+        fp.close()
+        
+        # now run coverage...
+        status, out, errout = utils.run('annotate-sections', 'tst-sections.py')
+        print out, errout
+        assert status == 0
+
+        results = open('./tst-sections.py.sections').read()
+        good = open('./tst-sections.py.sections.good').read()
+
+        assert results == good
