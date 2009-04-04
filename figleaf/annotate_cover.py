@@ -37,7 +37,6 @@ def report_as_cover(coverage, exclude_patterns, files_list,
 
     info_dict = {}
     for filename, (lines, covered) in line_info.items():
-        covered = coverage[filename]
         fp = open(filename, 'rU')
 
         (n_covered, n_lines, output) = annotate_file_cov(fp, lines, covered)
