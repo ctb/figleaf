@@ -3,6 +3,7 @@ import re
 import sys
 
 import figleaf
+from figleaf import annotate
 from figleaf.annotate import read_exclude_patterns, filter_files, logger, \
      read_files_list
 
@@ -60,7 +61,7 @@ def calc_coverage_lines(fp, lines, covered):
     return n_covered, n_lines, percent, not_covered
 
 
-def write_txt_report(info_dict):
+def write_txt_report(info_dict, remove_prefix=""):
     info_dict_items = info_dict.items()
 
     def sort_by_percent(a, b):
@@ -76,7 +77,6 @@ def write_txt_report(info_dict):
     summary_percent = 100
     if summary_lines:
         summary_percent = float(summary_cover) * 100. / float(summary_lines)
-
 
     percents = [ float(v[1]) * 100. / float(v[0])
                  for (k, v) in info_dict_items if v[0] ]
@@ -112,66 +112,38 @@ details
 
     for filename, (n_lines, n_covered, percent_covered, not_covered) in info_dict_items:
         not_covered = format_not_covered(not_covered)
-        sys.stdout.write(' %s\t%d\t%d\t%.1f\t%s\n'
+
+        if filename.startswith(remove_prefix):
+            filename = filename[len(remove_prefix):]
+            filename = filename.lstrip(os.path.sep)
+            
+        sys.stdout.write(' %s\t%d\t%d\t\t%.1f\t\t%s\n'
                 % (filename, n_lines, n_covered, percent_covered, not_covered))
 
 
-def create_report(args, exclude_patterns_file, files_list):
+def create_report(coverage, exclude_patterns, files_list, extra_files=None):
 
-    coverage = {}
-    for filename in args:
-        logger.debug("loading coverage info from '%s'\n" % (filename,))
-        try:
-            d = figleaf.read_coverage(filename)
-            coverage = figleaf.combine_coverage(coverage, d)
-        except IOError:
-            logger.error("cannot open filename '%s'\n" % (filename,))
+    line_info = annotate.build_python_coverage_info(coverage, exclude_patterns,
+                                                    files_list)
 
-    if not coverage:
-        logger.warning('EXITING -- no coverage info!\n')
-        sys.exit(-1)
+    if extra_files:
+        for (otherfile, lines, covered) in extra_files:
+            line_info[otherfile] = (lines, covered)
 
-    exclude_patterns = []
-    if exclude_patterns_file:
-        exclude_patterns = read_exclude_patterns(exclude_patterns_file)
-
-    files_list = files_list and read_files_list(options.files_list) or {}
-
-    keys = coverage.keys()
     info_dict = {}
-    for pyfile in filter_files(keys, exclude_patterns, files_list):
-
-        try:
-            fp = open(pyfile, 'rU')
-            lines = figleaf.get_lines(fp)
-        except KeyboardInterrupt:
-            raise
-        except IOError:
-            logger.error('CANNOT OPEN: %s' % (pyfile,))
-            continue
-        except Exception, e:
-            logger.error('ERROR: file %s, exception %s' % (pyfile, str(e)))
-            continue
-
-        #
-        # ok, we want to annotate this file.  now annotate file ==> html.
-        #
-
-        # initialize
-        covered = coverage.get(pyfile, set())
-
-        # rewind
-        fp.seek(0)
+    for filename, (lines, covered) in line_info.items():
+        fp = open(filename, 'rU')
 
         # annotate
         n_covered, n_lines, percent, not_covered \
                 = calc_coverage_lines(fp, lines, covered)
 
         # summarize
-        info_dict[pyfile] = (n_lines, n_covered, percent, not_covered)
+        info_dict[filename] = (n_lines, n_covered, percent, not_covered)
 
     ### print the report
-    write_txt_report(info_dict)
+    dirname = os.getcwd()
+    write_txt_report(info_dict, remove_prefix=dirname)
 
     logger.info('reported on %d file(s) total\n' % len(info_dict))
 
@@ -203,12 +175,30 @@ def main():
     (options, args) = option_parser.parse_args()
 
     if options.quiet:
-        logging.disable(logging.DEBUG)
+        logging.setLevel(logging.WARNING)
         
     if options.debug:
         logger.setLevel(logging.DEBUG)
 
+    exclude_patterns = []
+    if options.exclude_patterns_file:
+        exclude_patterns = read_exclude_patterns(exclude_patterns_file)
+
+    files_list = {}
+    if options.files_list:
+        files_list = annotate.read_files_list(options.files_list)
+
     if not args:
         args = ['.figleaf']
 
-    create_report(args, options.exclude_patterns_file, options.files_list)
+    coverage = {}
+    for filename in args:
+        logger.debug("loading coverage info from '%s'\n" % (filename,))
+        d = figleaf.read_coverage(filename)
+        coverage = figleaf.combine_coverage(coverage, d)
+
+    if not coverage:
+        logger.warning('EXITING -- no coverage info!\n')
+        sys.exit(-1)
+
+    create_report(coverage, exclude_patterns, files_list)

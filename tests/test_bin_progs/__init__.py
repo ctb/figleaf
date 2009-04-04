@@ -90,9 +90,20 @@ class Test_FigleafMiscOutput:
         assert status == 0
 
         results = open('./tst-cover.py.cover').read()
-        good = open('./tst-cover.py.good').read()
+        good = open('./tst-cover.py.cover.good').read()
 
         assert results == good
+        
+    def test_figleaf_report(self):
+        status, out, errout = utils.run('figleaf-report')
+        print out, errout
+        assert status == 0
+
+        # UPDATE "GOOD" output?
+        ## open('./tst-cover.py.report.good', 'w').write(out)
+        good = open('./tst-cover.py.report.good').read()
+
+        assert out == good
 
 class Test_Figleaf2HTML:
     """
