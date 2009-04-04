@@ -148,9 +148,6 @@ def report_as_html(coverage, directory, exclude_patterns, files_list,
         # ok, we want to annotate this file.  now annotate file ==> html.
         #
 
-        # rewind fp
-        fp.seek(0)
-
         # annotate
         output, n_covered, n_lines, percent = annotate_file_html(fp,
                                                                  lines,
@@ -258,8 +255,10 @@ def main():
 
     (options, args) = option_parser.parse_args()
 
+    logger.setLevel(logging.INFO)
+
     if options.quiet:
-        logging.disable(logging.DEBUG)
+        logging.disable(logging.WARNING)
         
     if options.debug:
         logger.setLevel(logging.DEBUG)
@@ -272,11 +271,8 @@ def main():
     coverage = {}
     for filename in args:
         logger.debug("loading coverage info from '%s'\n" % (filename,))
-        try:
-            d = figleaf.read_coverage(filename)
-            coverage = figleaf.combine_coverage(coverage, d)
-        except IOError:
-            logger.error("cannot open filename '%s'\n" % (filename,))
+        d = figleaf.read_coverage(filename)
+        coverage = figleaf.combine_coverage(coverage, d)
 
     if not coverage:
         logger.warning('EXITING -- no coverage info!\n')

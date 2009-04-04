@@ -1,42 +1,57 @@
 """
-@CTB document.
+Build coverage reports in a simple text format.
 
-update with annotate_html functions.
+Functions:
+
+ - report_as_cover
+ - annotate_file_cov
+
 """
 
-import figleaf
 import os
 import re
 
-from annotate import read_exclude_patterns, filter_files, logger
+import figleaf
+from figleaf import annotate
+from figleaf.annotate import read_exclude_patterns, filter_files, logger
 
-def report_as_cover(coverage, directory, exclude_patterns, files_list,
+def report_as_cover(coverage, exclude_patterns, files_list,
                     extra_files=None, include_zero=True):
+    """
+    Annotate Python & other files with basic coverage information.
+    """
 
     ### assemble information
 
+    # python files
     line_info = annotate.build_python_coverage_info(coverage,
                                                     exclude_patterns,
                                                     files_list)
 
+    # any other files that were passed in
     if extra_files:
         for (otherfile, lines, covered) in extra_files:
             line_info[otherfile] = (lines, covered)
 
+    ### annotate each files & gather summary statistics.
+
     info_dict = {}
     for filename, (lines, covered) in line_info.items():
-        covered = coverage[k]
-        fp = open(k, 'rU')
+        covered = coverage[filename]
+        fp = open(filename, 'rU')
+
         (n_covered, n_lines, output) = annotate_file_cov(fp, lines, covered)
 
-
+        if not include_zero and n_covered == 0: # include in summary stats?
+            continue
+        
         try:
             pcnt = n_covered * 100. / n_lines
         except ZeroDivisionError:
             pcnt = 100
-        info_dict[k] = (n_lines, n_covered, pcnt)
+        info_dict[filename] = (n_lines, n_covered, pcnt)
 
-        outfile = make_cover_filename(k)
+        outfile = filename + '.cover'
         try:
             outfp = open(outfile, 'w')
             outfp.write("\n".join(output))
@@ -48,19 +63,12 @@ def report_as_cover(coverage, directory, exclude_patterns, files_list,
 
         logger.info('reported on %s' % (outfile,))
 
-    ### print a summary, too.
-
-    info_dict_items = list(info_dict.items())
-
-    def pcnt_key(a):
-        return -a[1][2]
-
-    info_dict_items.sort(key=pcnt_key)
-
     logger.info('reported on %d file(s) total\n' % len(info_dict))
-    return len(info_dict)
-
+    
 def annotate_file_cov(fp, line_info, coverage_info):
+    """
+    Annotate a single file with covered/uncovered lines, returning statistics.
+    """
     n_covered = n_lines = 0
     output = []
     
@@ -89,9 +97,6 @@ def annotate_file_cov(fp, line_info, coverage_info):
     
     return (n_covered, n_lines, output)
 
-def make_cover_filename(orig):
-    return orig + '.cover'
-
 ###
 
 def main():
@@ -113,6 +118,10 @@ def main():
                              dest="exclude_patterns_file",
                              help="file containing regexp patterns to exclude")
 
+    option_parser.add_option('-f', '--files-list', action="store",
+                             dest="files_list",
+                             help="file containing filenames to report on")
+
     option_parser.add_option('-q', '--quiet', action='store_true',
                              dest='quiet',
          help="file containig regexp patterns of files to exclude from report")
@@ -121,10 +130,16 @@ def main():
                              dest='debug',
                              help='Show all debugging messages')
 
+    option_parser.add_option('-z', '--no-zero', action='store_true',
+                             dest='no_zero',
+                             help='Omit files with zero lines covered.')
+
     (options, args) = option_parser.parse_args()
 
+    logger.setLevel(logging.INFO)
+
     if options.quiet:
-        logging.disable(logging.DEBUG)
+        logger.setLevel(logging.ERROR)
 
     if options.debug:
         logger.setLevel(logging.DEBUG)
@@ -136,13 +151,21 @@ def main():
 
     coverage = {}
     for filename in args:
-        logger.debug("loading coverage info from '%s'\n" % (filename,))
+        logger.info("loading coverage info from '%s'\n" % (filename,))
         d = figleaf.read_coverage(filename)
         coverage = figleaf.combine_coverage(coverage, d)
+
+    files_list = {}
+    if options.files_list:
+        files_list = annotate.read_files_list(options.files_list)
 
     if not coverage:
         logger.warning('EXITING -- no coverage info!\n')
         sys.exit(-1)
 
-    exclude = read_exclude_patterns(options.exclude_patterns_file)
-    report_as_cover(coverage, exclude)
+    exclude = []
+    if options.exclude_patterns_file:
+        exclude = annotate.read_exclude_patterns(options.exclude_patterns_file)
+
+    report_as_cover(coverage, exclude, files_list,
+                    include_zero=not options.no_zero)
