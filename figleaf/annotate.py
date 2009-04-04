@@ -109,7 +109,7 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
         if filename.startswith('<doctest '):
             continue
 
-        yield realpath
+        yield filename
 
 def build_python_coverage_info(coverage, exclude_patterns, files_list):
     keys = coverage.keys()

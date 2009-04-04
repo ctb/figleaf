@@ -8,7 +8,7 @@ a = 1
 b = 2
 c = 3
 
-if 1:
+if a:
     print 'hello, world!'
 else:
     print 'goodbye'

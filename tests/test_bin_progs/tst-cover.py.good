@@ -1,0 +1,14 @@
+0 """
+0 A simple little program for testing figleaf command stuff.
++ """
++ import sys
++ print 'ARGV:', '::'.join(sys.argv[1:])
+0 
++ a = 1
++ b = 2
++ c = 3
+0 
++ if a:
++     print 'hello, world!'
+0 else:
+-     print 'goodbye'

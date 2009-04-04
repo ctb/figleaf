@@ -28,3 +28,11 @@ annotate/cover stuff; filename canonicalization?
 ---
 
 does sections coverage miss out on top-level stuff??
+
+---
+
+figleaf2ast
+
+---
+
+virtualenv tests for nose stuff?

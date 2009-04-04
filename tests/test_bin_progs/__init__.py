@@ -57,9 +57,46 @@ class Test_SimpleCommandLine:
         assert "ARGV: -a::b2\n" in out
         assert status == 0
 
+class Test_FigleafMiscOutput:
+    """
+    Test output.
+    """
+    def setUp(self):
+        try:
+            os.unlink('.figleaf')
+        except OSError:
+            pass
+        
+        try:
+            os.unlink('.figleaf_sections')
+        except OSError:
+            pass
+
+        try:
+            os.unlink('./tst-cover.py.cover')
+        except OSError:
+            pass
+
+        # record coverage...
+        status, out, errout = utils.run('figleaf', 'tst-cover.py')
+        print out, errout
+        assert status == 0
+
+    tearDown = setUp
+
+    def test_figleaf2cov(self):
+        status, out, errout = utils.run('figleaf2cover')
+        print out, errout
+        assert status == 0
+
+        results = open('./tst-cover.py.cover').read()
+        good = open('./tst-cover.py.good').read()
+
+        assert results == good
+
 class Test_Figleaf2HTML:
     """
-    Do a simple test of some of the command line scripts.
+    Test output.
     """
     def setUp(self):
         try:
