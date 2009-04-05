@@ -92,6 +92,9 @@ class Test_FigleafMiscOutput:
         assert status == 0
 
         results = open('./tst-cover.py.cover').read()
+        
+        # UPDATE "GOOD" output?
+        # open('./tst-cover.py.cover.good', 'w').write(results)
         good = open('./tst-cover.py.cover.good').read()
 
         assert results == good
@@ -102,7 +105,7 @@ class Test_FigleafMiscOutput:
         assert status == 0
 
         # UPDATE "GOOD" output?
-        # open('./tst-cover.py.report', 'w').write(out)
+        # open('./tst-cover.py.report.good', 'w').write(out)
         good = open('./tst-cover.py.report.good').read()
 
         assert out == good

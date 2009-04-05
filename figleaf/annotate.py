@@ -101,6 +101,11 @@ def filter_files(filenames, exclude_patterns = [], files_list = {}):
                          (filename,))
             continue
 
+        # remove threading.py -- dunno if this should be hardcoded, but
+        # it's causing trouble on various systems!
+        if filename.endswith(os.path.sep + 'threading.py'):
+            continue
+
         # also, check for <string> (source file from things like 'exec'):
         if filename == '<string>':
             continue
