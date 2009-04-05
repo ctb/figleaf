@@ -7,7 +7,7 @@ version_string = ".".join([ str(x) for x in sys.version_info[:2] ])
 
 class TestExclude:
     def setUp(self):
-        assert not figleaf._t           # something leaked, if this fails!
+        figleaf._t = None
 
     def tearDown(self):
         figleaf.stop()

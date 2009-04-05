@@ -2,11 +2,10 @@ import sys, os, figleaf
 
 class TestInclude:
     def setUp(self):
-        assert not figleaf._t
+        figleaf._t = None
 
     def tearDown(self):
         figleaf.stop()
-        figleaf._t = None
     
     def test_include_misc_path(self):
         "Check that tests/tst_include1.py is the only thing covered, if set"
