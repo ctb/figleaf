@@ -247,11 +247,6 @@ def get_info(section_name=None):
 
 #############
 
-def display_ast():
-    l = internals.LineGrabber(open(sys.argv[1]), 'rU')
-    l.pretty_print()
-    print l.lines
-
 def main():
     """
     Execute the given Python file with coverage, making it look like it is

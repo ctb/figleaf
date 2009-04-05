@@ -9,11 +9,12 @@ for k in 'types', 'symbol', 'sre_constants', 'keyword':
 
 ---
 
-also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.
+also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.  should
+be fixed now.
 
 ---
 
-no 2.3; is set in 2.4?
+no 2.3; is 'set' in 2.4?
 
 --
 
@@ -23,16 +24,20 @@ docs & tests for
 
 ---
 
-annotate/cover stuff; filename canonicalization?
-
----
-
 does sections coverage miss out on top-level stuff??
 
 ---
 
-figleaf2ast
+virtualenv tests for nose stuff?
 
 ---
 
-virtualenv tests for nose stuff?
+reporting stuff
+
+---
+
+TESTS for filename canonicalization?
+
+---
+
+trace hook stuff?  for sys.settrace.
