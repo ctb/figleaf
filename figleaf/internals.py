@@ -6,6 +6,15 @@ import sys
 import threading
 import types, symbol
 
+###def figleaf_settrace(*args, **kwargs):
+###    print 'ATTEMPTED OVERRIDE', args, kwargs
+###
+###_sys_settrace, sys.settrace = sys.settrace, figleaf_settrace
+###_threading_settrace, threading.settrace = threading.settrace, figleaf_settrace
+
+_sys_settrace = sys.settrace
+_threading_settrace = threading.settrace
+
 ###
 
 from compat import set
@@ -105,13 +114,13 @@ class CodeTracer(object):
     def _enable(self):
         self.started = True
         self.c.enable()
-        threading.settrace(self._threading_settrace)
+        _threading_settrace(self._threading_settrace)
 
     def _disable(self):
         self.started = False
-        sys.settrace(None)
+        _sys_settrace(None)
         sys.setprofile(None)
-        threading.settrace(None)
+        _threading_settrace(None)
         self.stop_section()
 
     def stop(self):
@@ -144,6 +153,40 @@ class CoverageData(object):
         
         if trace_obj:
             self.update(trace_obj)
+
+    def __sub__(self, other):
+        """Subtract -- only works on common-block coverage, not sections."""
+        assert isinstance(other, CoverageData)
+
+        me = dict(self.common)
+        for k, other_cov in other.common.items():
+            if k in me:
+                me_cov = me.pop(k)
+                diff = me_cov - other_cov
+                if diff:
+                    me[k] = diff        # subtract from existing coverage data
+        
+        diff = CoverageData()
+        diff.common = me
+        return diff
+
+    def __add__(self, other):
+        """Add -- only works on common-block coverage, not sections."""
+        assert isinstance(other, CoverageData)
+
+        me = dict(self.common)
+        for k, v in other.common.items():
+            if k in me:
+                me[k].update(v)         # add to existing coverage data
+            else:
+                me[k] = v
+        
+        combined = CoverageData()
+        combined.common = me
+        return combined
+
+    def __len__(self):
+        return (len(self.common) + len(self.sections))
 
     def update_coverage(self, coverage1, coverage2):
         for filename, lines in coverage2.items():
@@ -223,9 +266,9 @@ class PythonCollector(object):
         else:
             global_trace_fn = self.g0
 
-        sys.settrace(global_trace_fn)
+        _sys_settrace(global_trace_fn)
         if hasattr(threading, 'settrace'):
-            threading.settrace(global_trace_fn)
+            _threading_settrace(global_trace_fn)
 
     def g0(self, f, e, a):
         """

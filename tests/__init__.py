@@ -13,12 +13,13 @@ def setup():
     # correct directory, and not from some other figleaf installation.
     # (seems to be a pkg_resources issue where setuptools is loading
     # figleaf egg in by default.)
-    import figleaf
-
+    
+    import figleaf, figleaf.internals
     reload(sys.modules['figleaf'])
     reload(sys.modules['figleaf.internals'])
 
-    assert libdir in figleaf.__file__
+    import figleaf
+    assert libdir in figleaf.__file__, figleaf.__file__
 
 def teardown():
     sys.path.remove(libdir)

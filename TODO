@@ -9,8 +9,8 @@ for k in 'types', 'symbol', 'sre_constants', 'keyword':
 
 ---
 
-also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.  should
-be fixed now.
+also, 'figleaf Lib/test/regrtest.py' doesn't abspath regrtest.  (but should
+be fixed now.)
 
 ---
 
