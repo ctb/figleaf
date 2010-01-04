@@ -52,8 +52,8 @@ Known problems:
 
 AUTHOR: C. Titus Brown, titus@idyll.org, with contributions from Iain Lowe.
 
-'figleaf' is Copyright (C) 2006, 2007 C. Titus Brown.  It is under the
-BSD license.
+'figleaf' is Copyright (C) 2006-2010 C. Titus Brown.  It is under the
+MIT license.
 """
 __version__ = "0.6.1"
 

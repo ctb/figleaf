@@ -18,7 +18,7 @@ setup(name = 'figleaf',
       description = 'figleaf code coverage tool',
       author = 'C. Titus Brown',
       author_email = 'titus@caltech.edu',
-      license='BSD',
+      license='MIT',
       packages=['figleaf'],
       
       ext_modules=[Extension('figleaf._coverage', ['figleaf/_coverage.c']),],
