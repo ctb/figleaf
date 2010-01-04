@@ -1,3 +1,7 @@
+try:
+   set
+except NameError:
+   from sets import Set as set
 
 class Test_Subtract(object):
     def setup(self):
