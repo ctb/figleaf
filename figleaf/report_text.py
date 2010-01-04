@@ -20,7 +20,8 @@ except NameError:
 def format_not_covered(numbers):
     """Format the list of uncovered lines to have ranges where possible."""
 
-    numbers = sorted(numbers)
+    numbers = list(numbers)
+    numbers.sort()
 
     ranges = [[]]
     for num in numbers:
