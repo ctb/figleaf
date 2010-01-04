@@ -41,3 +41,7 @@ TESTS for filename canonicalization?
 ---
 
 trace hook stuff?  for sys.settrace.
+
+---
+
+use runpy 
