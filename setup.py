@@ -11,13 +11,13 @@ from setuptools import setup, find_packages
 from distutils.core import Extension
 
 setup(name = 'figleaf',
-      version="0.6.1",
-      url = 'http://darcs.idyll.org/~t/projects/figleaf/doc/',
-      download_url = 'http://darcs.idyll.org/~t/projects/figleaf-0.6.1.tar.gz',
+      version="0.7",
+      url = 'http://ctb.github.com/figleaf/doc/',
+      download_url = 'http://ctb.github.com/figleaf/figleaf-0.7.tar.gz',
       
       description = 'figleaf code coverage tool',
       author = 'C. Titus Brown',
-      author_email = 'titus@caltech.edu',
+      author_email = 'titus@idyll.org',
       license='MIT',
       packages=['figleaf'],
       
