@@ -20,8 +20,9 @@ setup(name = 'figleaf',
       author_email = 'titus@idyll.org',
       license='MIT',
       packages=['figleaf'],
-      
-      ext_modules=[Extension('figleaf._coverage', ['figleaf/_coverage.c']),],
+
+# DISABLED until I can get Windows packages building.
+#      ext_modules=[Extension('figleaf._coverage', ['figleaf/_coverage.c']),],
       
       entry_points = {
          'console_scripts': [
