@@ -28,9 +28,11 @@ class TestExclude:
 
         coverage = figleaf.get_data().gather_files()
         
+        print 'sysdir is:', sysdir
+
         found = False
         for k in coverage:
-            print k
+            print 'checking:', k
             if k.startswith(sysdir):
                 found = True
                 break
@@ -72,9 +74,11 @@ class TestExclude:
 
         coverage = figleaf.get_data().gather_files()
 
+        print 'sysdir is:', sysdir
+
         found = False
         for k in coverage:
-            print k
+            print 'checking:', k
             if k.startswith(sysdir):
                 found = True
                 break
