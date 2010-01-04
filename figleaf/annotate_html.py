@@ -62,10 +62,10 @@ def annotate_file_html(fp, lines, covered):
 def write_html_summary(info_dict, directory):
     info_dict_items = info_dict.items()
 
-    def pcnt_key(a):
-        return -a[1][2]
+    def sort_by_pcnt(a, b):
+        return cmp(-a[1][2], -b[1][2])
 
-    info_dict_items.sort(key=pcnt_key)
+    info_dict_items.sort(sort_by_pcnt)
 
     summary_lines = sum([ v[0] for (k, v) in info_dict_items])
     summary_cover = sum([ v[1] for (k, v) in info_dict_items])
